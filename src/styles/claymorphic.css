@@ -1,0 +1,379 @@
+/* Claymorphic Design System */
+:root {
+  --clay-bg: linear-gradient(145deg, #f0f4f8, #ffffff);
+  --clay-shadow-outer: 
+    10px 10px 20px rgba(166, 180, 200, 0.2),
+    -8px -8px 20px rgba(255, 255, 255, 0.7);
+  --clay-shadow-inner: 
+    inset 2px 2px 5px rgba(166, 180, 200, 0.2),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+  --clay-border: 1px solid rgba(255, 255, 255, 0.7);
+  --clay-radius: 16px;
+  --clay-radius-sm: 12px;
+  --clay-radius-pill: 50px;
+  --clay-text-primary: #334155;
+  --clay-text-secondary: #64748b;
+  --clay-blue-gradient: linear-gradient(135deg, #3b82f6, #60a5fa);
+  --clay-accent-blue: #3b82f6;
+  --clay-accent-green: #10b981;
+  --clay-accent-red: #ef4444;
+  --clay-accent-orange: #f59e0b;
+  --clay-accent-purple: #8b5cf6;
+  --clay-transition: all 0.2s ease-in-out;
+}
+
+/* General Claymorphic Elements */
+.clay-card {
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay-shadow-outer);
+  border: var(--clay-border);
+  transition: var(--clay-transition);
+}
+
+.clay-card-sm {
+  border-radius: var(--clay-radius-sm);
+  background: var(--clay-bg);
+  box-shadow: var(--clay-shadow-outer);
+  border: var(--clay-border);
+  transition: var(--clay-transition);
+}
+
+.clay-inner {
+  background: #f8fafc;
+  border-radius: var(--clay-radius-sm);
+  box-shadow: var(--clay-shadow-inner);
+  border: var(--clay-border);
+}
+
+.clay-button {
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius-pill);
+  box-shadow: var(--clay-shadow-outer);
+  border: var(--clay-border);
+  transition: var(--clay-transition);
+  visibility: visible;
+  opacity: 1;
+  display: flex;
+}
+
+.clay-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    12px 12px 24px rgba(166, 180, 200, 0.3),
+    -10px -10px 24px rgba(255, 255, 255, 0.8);
+}
+
+.clay-button:active {
+  transform: translateY(1px);
+  box-shadow: var(--clay-shadow-inner);
+}
+
+.clay-button.active {
+  background: var(--clay-bg);
+  color: #2563eb;
+  box-shadow: 
+    4px 4px 12px rgba(37, 99, 235, 0.2),
+    -4px -4px 12px rgba(255, 255, 255, 0.8),
+    inset 1px 1px 3px rgba(37, 99, 235, 0.1);
+}
+
+.clay-icon-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--clay-bg);
+  box-shadow: var(--clay-shadow-outer);
+  border: var(--clay-border);
+  transition: var(--clay-transition);
+}
+
+.clay-icon-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    8px 8px 16px rgba(166, 180, 200, 0.3),
+    -6px -6px 16px rgba(255, 255, 255, 0.8);
+}
+
+.clay-icon-button:active {
+  transform: translateY(1px);
+  box-shadow: var(--clay-shadow-inner);
+}
+
+.clay-map-container {
+  border-radius: var(--clay-radius);
+  overflow: hidden;
+  box-shadow: var(--clay-shadow-outer);
+  border: var(--clay-border);
+  /* Ensure map is interactive */
+  pointer-events: auto;
+}
+
+.clay-floating-button {
+  position: absolute;
+  bottom: 25px;
+  right: 20px;
+  z-index: 400;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 
+    5px 5px 15px rgba(166, 180, 200, 0.4),
+    -5px -5px 15px rgba(255, 255, 255, 0.8);
+  border: var(--clay-border);
+  transition: var(--clay-transition);
+}
+
+.clay-floating-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    7px 7px 20px rgba(166, 180, 200, 0.5),
+    -7px -7px 20px rgba(255, 255, 255, 0.9);
+}
+
+.clay-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.clay-badge {
+  border-radius: var(--clay-radius-pill);
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.clay-legend-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: var(--clay-radius-sm);
+  transition: var(--clay-transition);
+}
+
+.clay-legend-item:hover {
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--clay-shadow-inner);
+}
+
+/* App-specific modifications */
+.clay-header {
+  background: var(--clay-bg);
+  border-radius: 0 0 var(--clay-radius) var(--clay-radius);
+  box-shadow: 0 4px 15px rgba(166, 180, 200, 0.15);
+  border-bottom: var(--clay-border);
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  z-index: 10;
+}
+
+/* Main background style */
+.clay-background {
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(236, 254, 255, 0.7) 0%, transparent 60%),
+    radial-gradient(circle at 80% 70%, rgba(224, 242, 254, 0.7) 0%, transparent 60%),
+    linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+}
+
+/* Bottom navigation specific styling */
+.clay-bottom-nav {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 -5px 20px rgba(166, 180, 200, 0.15);
+  border-radius: var(--clay-radius) var(--clay-radius) 0 0;
+  padding: 10px 0;
+}
+
+/* Enhanced Popup styling for better visibility */
+.leaflet-popup-content-wrapper {
+  border-radius: var(--clay-radius);
+  background: var(--clay-bg);
+  box-shadow: var(--clay-shadow-outer);
+  border: var(--clay-border);
+  min-width: 280px !important;
+  max-width: 320px !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  min-height: auto !important;
+}
+
+.leaflet-popup-tip {
+  background: white;
+  box-shadow: var(--clay-shadow-outer);
+}
+
+/* Ensure popup is properly positioned and visible */
+.leaflet-popup {
+  margin-bottom: 20px !important;
+}
+
+.leaflet-popup-close-button {
+  color: #64748b !important;
+  font-size: 18px !important;
+  padding: 8px !important;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--clay-shadow-outer);
+  border: var(--clay-border);
+  transition: var(--clay-transition);
+}
+
+.leaflet-popup-close-button:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #ef4444 !important;
+  transform: scale(1.1);
+}
+
+/* Make buttons in popups visible and functional */
+.leaflet-popup-content .clay-button,
+.leaflet-popup-content button {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  z-index: 1000;
+}
+
+/* Preserve Leaflet functionality */
+.leaflet-container {
+  /* Critical - enables clicking and dragging on map */
+  pointer-events: auto !important;
+}
+
+.leaflet-control-container .leaflet-control {
+  pointer-events: auto !important;
+}
+
+/* Make sure all Leaflet interactive elements work */
+.leaflet-interactive {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+/* Make job card buttons always visible without !important flags that can break map */
+.clay-card .clay-button {
+  visibility: visible;
+  opacity: 1;
+  display: flex;
+}
+
+/* Apply button styles without !important to avoid conflicts */
+.clay-card .clay-button.bg-blue-500 {
+  background-color: var(--clay-accent-blue);
+  color: white;
+}
+
+.clay-card .clay-button.bg-red-500 {
+  background-color: var(--clay-accent-red);
+  color: white;
+}
+
+/* Only use !important for specific button visibility in job cards */
+.JobCard .clay-button {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Markers */
+.custom-job-marker {
+  filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.2));
+  pointer-events: auto !important; /* Ensure markers are clickable */
+}
+
+/* Ensure popup content is scrollable if needed */
+.leaflet-popup-content-wrapper {
+  overflow: visible;
+}
+
+/* Adjust popup positioning to prevent cutoff */
+.leaflet-popup-pane .leaflet-popup {
+  transform-origin: center bottom;
+}
+
+/* Make sure popup doesn't get cut off at map edges */
+.leaflet-popup-pane {
+  z-index: 700;
+}
+
+/* Responsive popup sizing */
+@media (max-width: 768px) {
+  .leaflet-popup-content-wrapper {
+    min-width: 260px !important;
+    max-width: 300px !important;
+  }
+}
+
+/* Hide scrollbars while maintaining touch scrolling functionality */
+.scrollable-content {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  overflow-y: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.scrollable-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Today's schedule horizontal layout */
+.schedule-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 10px;
+  padding: 10px 0;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.schedule-container::-webkit-scrollbar {
+  display: none;
+}
+
+.schedule-item {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  min-width: 120px;
+  max-width: 150px;
+}
+
+/* Swipe indicator for schedule */
+.swipe-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--clay-text-secondary);
+  margin-top: 5px;
+}
+
+.swipe-indicator svg {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+}
