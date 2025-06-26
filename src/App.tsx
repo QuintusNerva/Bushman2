@@ -113,16 +113,24 @@ function App() {
     console.log('Active tab:', tab);
   };
 
+  const navigateToProfile = () => {
+    setActiveTab('profile');
+    console.log('Navigating to profile');
+  };
+
   // Render the active tab content
   const renderTabContent = () => {
     switch (activeTab) {
       case 'jobs':
         return (
-          <>
+          <div className="space-y-4">
             <h1 className="text-2xl font-bold text-slate-800">Available Jobs</h1>
             
-            {/* User profile card */}
-            <div className="bg-white rounded-xl shadow-sm">
+            {/* User profile card - Now clickable */}
+            <div 
+              className="bg-white rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-all duration-200"
+              onClick={navigateToProfile}
+            >
               <div className="p-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
@@ -154,14 +162,14 @@ function App() {
             </div>
             
             {/* Map with sidebar toggle */}
-            <div className="relative">
+            <div className="relative mb-4">
               <InteractiveMap 
                 jobs={sampleJobs} 
                 suppliers={[]} 
                 onJobSelect={handleJobSelect} 
                 onToggleSidebar={toggleSidebar}
                 sidebarOpen={sidebarOpen}
-                className="h-[calc(100vh-280px)] min-h-[500px]"
+                className="h-[400px] md:h-[500px] w-full z-0"
               />
               
               <JobSidebar 
@@ -173,7 +181,7 @@ function App() {
             </div>
             
             {/* Today's Schedule */}
-            <div className="bg-white rounded-xl shadow-sm p-4">
+            <div className="bg-white rounded-xl shadow-sm p-4 z-10 relative">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-semibold text-slate-800">Today's Schedule</h3>
                 <div className="text-sm text-slate-500">
@@ -190,7 +198,7 @@ function App() {
                 ))}
               </div>
             </div>
-          </>
+          </div>
         );
       case 'calendar':
         return <CalendarView />;
@@ -207,7 +215,7 @@ function App() {
 
   return (
     <div className="app-container bg-slate-50 min-h-screen pb-20">
-      <div className="p-4 space-y-4">
+      <div className="p-4">
         {renderTabContent()}
       </div>
       

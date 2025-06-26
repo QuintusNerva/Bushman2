@@ -1,4 +1,4 @@
-import { Home, Calendar, ShoppingBag, MessageSquare, User } from 'lucide-react';
+import { Home, Calendar, ShoppingBag, MessageSquare } from 'lucide-react';
 
 interface BottomNavProps {
   activeTab: string;
@@ -11,7 +11,6 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
     { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'store', label: 'Store', icon: ShoppingBag },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
-    { id: 'profile', label: 'Profile', icon: User },
   ];
 
   return (

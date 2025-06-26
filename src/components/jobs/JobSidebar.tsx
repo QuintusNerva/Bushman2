@@ -37,7 +37,7 @@ export function JobSidebar({ jobs, onJobSelect, open, onOpenChange }: JobSidebar
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-md p-0 overflow-y-auto">
+      <SheetContent side="right" className="w-full sm:max-w-md p-0 overflow-y-auto z-50">
         <SheetHeader className="p-4 border-b">
           <SheetTitle>Available Jobs</SheetTitle>
         </SheetHeader>
