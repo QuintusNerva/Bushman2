@@ -328,15 +328,28 @@
 
 /* Hide scrollbars while maintaining touch scrolling functionality */
 .scrollable-content {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
   overflow-y: auto;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .scrollable-content::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  display: none !important; /* Chrome, Safari and Opera */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Additional global scrollbar hiding for all elements with overflow */
+* {
+  scrollbar-width: none; /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+  width: 0;
+  height: 0;
 }
 
 /* Today's schedule horizontal layout */

@@ -7,96 +7,33 @@ import { CalendarView } from './components/calendar/CalendarView';
 import { StoreView } from './components/store/StoreView';
 import { MessagesView } from './components/messages/MessagesView';
 import { ContractorDashboard } from './components/profile/ContractorDashboard';
+import { TodaysSchedule } from './components/dashboard/TodaysSchedule';
 import { Job } from './types';
-
-// Sample data for testing
-const sampleJobs: Job[] = [
-  {
-    id: '1',
-    title: 'Water Softener Installation',
-    description: 'Install new water softener system in residential home',
-    type: 'Softener',
-    status: 'unclaimed',
-    location: {
-      lat: 28.5383,
-      lng: -81.3792,
-      address: '123 Main St, Orlando, FL'
-    },
-    customer: {
-      name: 'Jane Doe',
-      phone: '407-555-1234',
-      email: 'jane@example.com'
-    },
-    priority: 'high',
-    estimatedDuration: 3,
-    createdAt: new Date('2023-06-15')
-  },
-  {
-    id: '2',
-    title: 'RO System Maintenance',
-    description: 'Perform routine maintenance on reverse osmosis system',
-    type: 'RO',
-    status: 'unclaimed',
-    location: {
-      lat: 28.5483,
-      lng: -81.3692,
-      address: '456 Oak Ave, Orlando, FL'
-    },
-    customer: {
-      name: 'John Smith',
-      phone: '407-555-5678',
-      email: 'john@example.com'
-    },
-    priority: 'medium',
-    estimatedDuration: 1.5,
-    createdAt: new Date('2023-06-16')
-  },
-  {
-    id: '3',
-    title: 'UV Light Replacement',
-    description: 'Replace UV light in water purification system',
-    type: 'UV',
-    status: 'unclaimed',
-    location: {
-      lat: 28.5283,
-      lng: -81.3892,
-      address: '789 Pine Rd, Orlando, FL'
-    },
-    customer: {
-      name: 'Bob Johnson',
-      phone: '407-555-9012',
-      email: 'bob@example.com'
-    },
-    priority: 'urgent',
-    estimatedDuration: 1,
-    createdAt: new Date('2023-06-17')
-  },
-  {
-    id: '4',
-    title: 'Whole House Filter Installation',
-    description: 'Install new whole house water filtration system',
-    type: 'Whole House',
-    status: 'unclaimed',
-    location: {
-      lat: 28.5183,
-      lng: -81.3992,
-      address: '101 Elm Blvd, Orlando, FL'
-    },
-    customer: {
-      name: 'Sarah Williams',
-      phone: '407-555-3456',
-      email: 'sarah@example.com'
-    },
-    priority: 'low',
-    estimatedDuration: 4,
-    createdAt: new Date('2023-06-18')
-  }
-];
+import { mockJobs } from './data/mockData';
 
 function App() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('jobs');
+
+  // Mock contractor location (Orlando)
+  const contractorLocation = { lat: 28.5383, lng: -81.3792 };
+
+  // Add scheduled dates to some mock jobs for today's schedule
+  const today = new Date();
+  const enhancedMockJobs = mockJobs.map((job, index) => {
+    // Add scheduled dates to a few jobs for today at different hours
+    if (index % 3 === 0) {
+      const scheduledDate = new Date(today);
+      scheduledDate.setHours(9 + (index % 8), 0, 0, 0); // Distribute between 9 AM and 4 PM
+      return {
+        ...job,
+        scheduledDate,
+        status: index % 2 === 0 ? 'scheduled' : 'claimed'
+      };
+    }
+    return job;
+  });
 
   const handleJobSelect = (job: Job) => {
     setSelectedJob(job);
@@ -164,7 +101,7 @@ function App() {
             {/* Map with sidebar toggle */}
             <div className="relative mb-4">
               <InteractiveMap 
-                jobs={sampleJobs} 
+                jobs={enhancedMockJobs} 
                 suppliers={[]} 
                 onJobSelect={handleJobSelect} 
                 onToggleSidebar={toggleSidebar}
@@ -173,31 +110,15 @@ function App() {
               />
               
               <JobSidebar 
-                jobs={sampleJobs.filter(job => job.status === 'unclaimed')} 
+                jobs={enhancedMockJobs.filter(job => job.status === 'unclaimed')} 
                 onJobSelect={handleJobSelect}
                 open={sidebarOpen}
                 onOpenChange={setSidebarOpen}
               />
             </div>
             
-            {/* Today's Schedule */}
-            <div className="bg-white rounded-xl shadow-sm p-4 z-10 relative">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-slate-800">Today's Schedule</h3>
-                <div className="text-sm text-slate-500">
-                  Swipe to scroll →
-                </div>
-              </div>
-              
-              <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
-                {['8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM'].map((time) => (
-                  <div key={time} className="min-w-[100px] w-[100px] flex-shrink-0 border border-dashed border-slate-300 rounded-lg p-3 text-center">
-                    <div className="font-medium text-slate-700">{time}</div>
-                    <div className="text-sm text-slate-400">Drop here</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Today's Schedule - Using the TodaysSchedule component */}
+            <TodaysSchedule jobs={enhancedMockJobs} contractorLocation={contractorLocation} />
           </div>
         );
       case 'calendar':

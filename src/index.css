@@ -69,6 +69,12 @@
 @layer base {
   * {
     @apply border-border;
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
   body {
     @apply bg-background text-foreground;
@@ -118,4 +124,14 @@
 
 .profile-card-clickable:hover:after {
   opacity: 1;
+}
+
+/* Hide scrollbars globally */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

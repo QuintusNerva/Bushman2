@@ -14,7 +14,11 @@ import {
   FileText, 
   Key, 
   Package, 
-  ShoppingBag
+  ShoppingBag,
+  Calendar,
+  Play,
+  Navigation,
+  PhoneCall
 } from 'lucide-react';
 
 interface JobDetailsModalProps {
@@ -89,6 +93,35 @@ export function JobDetailsModal({
     }
   };
 
+  // Check if job is scheduled
+  const isScheduled = job.status === 'scheduled' || job.status === 'claimed';
+
+  // Handle contact customer
+  const handleContactCustomer = () => {
+    window.open(`tel:${job.customer.phone}`);
+  };
+
+  // Handle get directions
+  const handleGetDirections = () => {
+    if (job.location.lat && job.location.lng) {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${job.location.lat},${job.location.lng}`);
+    } else {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.location.address)}`);
+    }
+  };
+
+  // Handle reschedule
+  const handleReschedule = () => {
+    console.log('Reschedule job:', job.id);
+    // Placeholder for reschedule functionality
+  };
+
+  // Handle start job
+  const handleStartJob = () => {
+    console.log('Start job:', job.id);
+    // Placeholder for start job functionality
+  };
+
   // Mock data for additional job details
   const mockJobDetails = {
     systemModel: job.type === 'UV' ? 'UV Max Pro 20 System' : 
@@ -116,12 +149,11 @@ export function JobDetailsModal({
 
   const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-      <div className="max-w-md p-0 overflow-hidden bg-gradient-to-b from-slate-100 to-white border-none rounded-2xl">
+      <div className="max-w-md p-0 overflow-hidden bg-gradient-to-b from-slate-100 to-white border-none rounded-2xl clay-card">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-700 to-slate-600 p-4 flex items-center">
-          <Button variant="ghost" size="sm" className="mr-2 text-white hover:bg-slate-600/50" onClick={onClose}>
-            <ArrowLeft className="h-5 w-5 mr-1" />
-            Back
+        <div className="bg-gradient-to-r from-slate-700 to-slate-600 p-4 flex items-center rounded-t-2xl">
+          <Button variant="ghost" size="sm" className="mr-2 text-white hover:bg-slate-600/50 clay-icon-button" onClick={onClose}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <h2 className="text-xl font-semibold text-white flex-1 text-center mr-8">Job Details</h2>
         </div>
@@ -131,7 +163,7 @@ export function JobDetailsModal({
           <div className="clay-card mb-4 p-4">
             <div className="flex justify-between items-start mb-1">
               <h1 className="text-xl font-bold text-slate-800">{job.title}</h1>
-              <Badge className={`${getPriorityColor(job.priority)} px-3 py-1 text-sm font-medium`}>
+              <Badge className={`${getPriorityColor(job.priority)} px-3 py-1 text-sm font-medium rounded-full`}>
                 {job.priority}
               </Badge>
             </div>
@@ -150,6 +182,18 @@ export function JobDetailsModal({
                 <Phone className="h-4 w-4 mr-2 text-pink-500" />
                 <span className="text-slate-800">{job.customer.name} • {job.customer.phone}</span>
               </div>
+              
+              {isScheduled && (
+                <div className="mb-3">
+                  <button 
+                    onClick={handleContactCustomer}
+                    className="clay-button flex items-center px-3 py-2 text-sm text-blue-600 bg-blue-50 rounded-xl mt-1 w-full"
+                  >
+                    <PhoneCall className="h-4 w-4 mr-2" />
+                    Contact Customer
+                  </button>
+                </div>
+              )}
               
               <div className="flex items-start">
                 <MessageSquare className="h-4 w-4 mr-2 text-blue-500 mt-1 flex-shrink-0" />
@@ -172,6 +216,18 @@ export function JobDetailsModal({
                 <MapPin className="h-4 w-4 mr-2 text-red-400 mt-1 flex-shrink-0" />
                 <span className="text-slate-800">{job.location.address}</span>
               </div>
+              
+              {isScheduled && (
+                <div className="mb-3">
+                  <button 
+                    onClick={handleGetDirections}
+                    className="clay-button flex items-center px-3 py-2 text-sm text-green-600 bg-green-50 rounded-xl mt-1 w-full"
+                  >
+                    <Navigation className="h-4 w-4 mr-2" />
+                    Get Directions
+                  </button>
+                </div>
+              )}
               
               <div className="flex items-center mb-2">
                 <Car className="h-4 w-4 mr-2 text-blue-400" />
@@ -239,27 +295,46 @@ export function JobDetailsModal({
               ))}
             </div>
             
-            <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">
+            <Button className="w-full clay-button bg-blue-500 hover:bg-blue-600 text-white">
               <ShoppingBag className="h-4 w-4 mr-2" />
               Parts needed for this job
             </Button>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 mt-5 mb-2">
-            <Button 
-              className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700"
-              onClick={() => onReject(job.id)}
-            >
-              Reject Job
-            </Button>
-            <Button 
-              className="flex-1 bg-green-500 hover:bg-green-600 text-white"
-              onClick={() => onAccept(job.id)}
-            >
-              Accept Job
-            </Button>
-          </div>
+          {isScheduled ? (
+            <div className="flex gap-3 mt-5 mb-2">
+              <button 
+                className="flex-1 clay-button bg-slate-200 hover:bg-slate-300 text-slate-700 py-3 rounded-xl flex items-center justify-center"
+                onClick={handleReschedule}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Reschedule
+              </button>
+              <button 
+                className="flex-1 clay-button bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl flex items-center justify-center"
+                onClick={handleStartJob}
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Start Job
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-3 mt-5 mb-2">
+              <Button 
+                className="flex-1 clay-button bg-slate-200 hover:bg-slate-300 text-slate-700"
+                onClick={() => onReject(job.id)}
+              >
+                Reject Job
+              </Button>
+              <Button 
+                className="flex-1 clay-button bg-green-500 hover:bg-green-600 text-white"
+                onClick={() => onAccept(job.id)}
+              >
+                Accept Job
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
