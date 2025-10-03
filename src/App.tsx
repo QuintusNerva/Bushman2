@@ -76,38 +76,37 @@ function App() {
               />
             </div>
 
-            {/* Overlaid Header - Transparent */}
-            <div className="absolute top-0 left-0 right-0 z-10 p-4">
+            {/* Overlaid Header - Compact */}
+            <div className="absolute top-0 left-0 right-0 z-10 p-3">
               <div
-                className="bg-white/95 backdrop-blur-md rounded-3xl shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200"
+                className="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 max-w-2xl mx-auto"
                 onClick={navigateToProfile}
               >
-                <div className="p-5">
-                  <div className="flex items-center gap-3 mb-4">
+                <div className="p-3">
+                  <div className="flex items-center gap-2">
                     <img
                       src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100"
                       alt="Ethan Carter"
-                      className="w-14 h-14 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                     />
-                    <div className="flex-1">
-                      <p className="text-sm text-slate-600 font-medium">Technician</p>
-                      <h3 className="text-lg font-bold text-slate-900">Ethan Carter</h3>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-slate-600 font-medium leading-tight">Technician</p>
+                      <h3 className="text-sm font-bold text-slate-900 truncate">Ethan Carter</h3>
                     </div>
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-blue-50/80 rounded-2xl p-4 text-center">
-                      <p className="text-sm text-blue-600 font-semibold mb-1">Scheduled</p>
-                      <p className="text-3xl font-bold text-slate-900">3</p>
-                    </div>
-                    <div className="bg-green-50/80 rounded-2xl p-4 text-center">
-                      <p className="text-sm text-green-600 font-semibold mb-1">Available</p>
-                      <p className="text-3xl font-bold text-slate-900">2</p>
-                    </div>
-                    <div className="bg-blue-50/80 rounded-2xl p-4 text-center">
-                      <p className="text-sm text-blue-600 font-semibold mb-1">Earnings</p>
-                      <p className="text-3xl font-bold text-slate-900">$450</p>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="text-center px-2">
+                        <p className="text-xs text-blue-600 font-semibold leading-tight">Scheduled</p>
+                        <p className="text-lg font-bold text-slate-900">3</p>
+                      </div>
+                      <div className="text-center px-2">
+                        <p className="text-xs text-green-600 font-semibold leading-tight">Available</p>
+                        <p className="text-lg font-bold text-slate-900">2</p>
+                      </div>
+                      <div className="text-center px-2">
+                        <p className="text-xs text-blue-600 font-semibold leading-tight">Earnings</p>
+                        <p className="text-lg font-bold text-slate-900">$450</p>
+                      </div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full ml-1"></div>
                     </div>
                   </div>
                 </div>
