@@ -1,355 +1,229 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Send, Paperclip, MoreVertical, Phone, Video } from 'lucide-react';
+import { ArrowLeft, Image as ImageIcon, Link as LinkIcon, Send } from 'lucide-react';
 
 interface Message {
   id: string;
-  senderId: string;
-  text: string;
+  senderId: 'customer' | 'contractor';
+  text?: string;
+  image?: string;
+  attachment?: {
+    name: string;
+    type: string;
+    url: string;
+  };
   timestamp: Date;
-  read: boolean;
 }
 
-interface Conversation {
-  id: string;
-  participantId: string;
-  participantName: string;
-  participantAvatar: string;
-  lastMessage: string;
-  lastMessageTime: Date;
-  unreadCount: number;
-}
+type MessageTab = 'support' | 'customer' | 'team';
 
 export function MessagesView() {
-  const [activeConversation, setActiveConversation] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<MessageTab>('customer');
   const [messageText, setMessageText] = useState('');
-  
-  // Sample conversations
-  const conversations: Conversation[] = [
+
+  const messages: Message[] = [
     {
       id: '1',
-      participantId: 'user1',
-      participantName: 'Jane Doe',
-      participantAvatar: 'JD',
-      lastMessage: 'When will you arrive for the water softener installation?',
-      lastMessageTime: new Date('2023-06-15T14:30:00'),
-      unreadCount: 2
+      senderId: 'customer',
+      text: "Hi, I'm having trouble with the installation. Can you help?",
+      timestamp: new Date('2024-10-03T09:00:00')
     },
     {
       id: '2',
-      participantId: 'user2',
-      participantName: 'Bob Johnson',
-      participantAvatar: 'BJ',
-      lastMessage: 'Thanks for the quick service!',
-      lastMessageTime: new Date('2023-06-14T10:15:00'),
-      unreadCount: 0
+      senderId: 'contractor',
+      text: 'Of course! Can you send me some photos of the install site?',
+      timestamp: new Date('2024-10-03T09:05:00')
     },
     {
       id: '3',
-      participantId: 'user3',
-      participantName: 'Sarah Williams',
-      participantAvatar: 'SW',
-      lastMessage: 'Do you have any availability next week?',
-      lastMessageTime: new Date('2023-06-13T16:45:00'),
-      unreadCount: 0
+      senderId: 'customer',
+      text: 'Sure, here are a few.',
+      timestamp: new Date('2024-10-03T09:10:00')
+    },
+    {
+      id: '4',
+      senderId: 'customer',
+      image: 'https://images.pexels.com/photos/1179229/pexels-photo-1179229.jpeg?auto=compress&cs=tinysrgb&w=600',
+      timestamp: new Date('2024-10-03T09:11:00')
+    },
+    {
+      id: '5',
+      senderId: 'contractor',
+      text: "Thanks! I see the issue. It looks like the wiring is incorrect. Please refer to the catalog link I'm sending for the correct wiring diagram.",
+      timestamp: new Date('2024-10-03T09:15:00')
+    },
+    {
+      id: '6',
+      senderId: 'contractor',
+      attachment: {
+        name: 'Wiring Diagram',
+        type: 'document',
+        url: '#'
+      },
+      timestamp: new Date('2024-10-03T09:16:00')
     }
   ];
-  
-  // Sample messages for the active conversation
-  const messages: Record<string, Message[]> = {
-    '1': [
-      {
-        id: 'm1',
-        senderId: 'user1',
-        text: 'Hi there! I was wondering when you will arrive for the water softener installation?',
-        timestamp: new Date('2023-06-15T14:30:00'),
-        read: true
-      },
-      {
-        id: 'm2',
-        senderId: 'currentUser',
-        text: 'Hello! I should be there around 2 PM tomorrow. Does that work for you?',
-        timestamp: new Date('2023-06-15T14:35:00'),
-        read: true
-      },
-      {
-        id: 'm3',
-        senderId: 'user1',
-        text: 'Yes, that works perfectly. Do I need to prepare anything before you arrive?',
-        timestamp: new Date('2023-06-15T14:40:00'),
-        read: false
-      },
-      {
-        id: 'm4',
-        senderId: 'user1',
-        text: 'Also, how long do you think the installation will take?',
-        timestamp: new Date('2023-06-15T14:41:00'),
-        read: false
-      }
-    ],
-    '2': [
-      {
-        id: 'm5',
-        senderId: 'currentUser',
-        text: 'How is the RO system working for you?',
-        timestamp: new Date('2023-06-14T10:00:00'),
-        read: true
-      },
-      {
-        id: 'm6',
-        senderId: 'user2',
-        text: 'It\'s working great! The water tastes so much better now.',
-        timestamp: new Date('2023-06-14T10:10:00'),
-        read: true
-      },
-      {
-        id: 'm7',
-        senderId: 'user2',
-        text: 'Thanks for the quick service!',
-        timestamp: new Date('2023-06-14T10:15:00'),
-        read: true
-      }
-    ],
-    '3': [
-      {
-        id: 'm8',
-        senderId: 'user3',
-        text: 'I\'m interested in getting a water softener installed.',
-        timestamp: new Date('2023-06-13T16:30:00'),
-        read: true
-      },
-      {
-        id: 'm9',
-        senderId: 'currentUser',
-        text: 'Great! I\'d be happy to help with that. What\'s your address so I can check if we service your area?',
-        timestamp: new Date('2023-06-13T16:35:00'),
-        read: true
-      },
-      {
-        id: 'm10',
-        senderId: 'user3',
-        text: '123 Pine St, Orlando, FL',
-        timestamp: new Date('2023-06-13T16:40:00'),
-        read: true
-      },
-      {
-        id: 'm11',
-        senderId: 'user3',
-        text: 'Do you have any availability next week?',
-        timestamp: new Date('2023-06-13T16:45:00'),
-        read: true
-      }
-    ]
-  };
-  
-  // Format timestamp
-  const formatMessageTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-  
-  // Format conversation timestamp
-  const formatConversationTime = (date: Date) => {
-    const now = new Date();
-    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) {
-      return formatMessageTime(date);
-    } else if (diffDays === 1) {
-      return 'Yesterday';
-    } else if (diffDays < 7) {
-      return date.toLocaleDateString([], { weekday: 'short' });
-    } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-    }
-  };
-  
-  // Handle sending a message
+
   const handleSendMessage = () => {
-    if (!messageText.trim() || !activeConversation) return;
-    
-    // In a real app, you would send the message to the server here
+    if (!messageText.trim()) return;
     console.log('Sending message:', messageText);
-    
-    // Clear the input
     setMessageText('');
   };
-  
-  // Get the active conversation's messages
-  const activeMessages = activeConversation ? messages[activeConversation] || [] : [];
-  
-  // Get the active conversation's participant
-  const activeParticipant = activeConversation 
-    ? conversations.find(conv => conv.id === activeConversation) 
-    : null;
-  
+
+  const customerAvatar = 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100';
+  const contractorAvatar = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100';
+
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-800">Messages</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-200px)]">
-        {/* Conversations list */}
-        <Card className="md:col-span-1 overflow-hidden flex flex-col">
-          <CardHeader className="pb-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      <div className="bg-white shadow-sm">
+        <div className="flex items-center justify-between p-4 max-w-2xl mx-auto">
+          <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+            <ArrowLeft className="w-6 h-6 text-slate-800" />
+          </button>
+          <h1 className="text-xl font-bold text-slate-900">Messages</h1>
+          <div className="w-10"></div>
+        </div>
+
+        <div className="flex border-b max-w-2xl mx-auto">
+          <button
+            onClick={() => setActiveTab('support')}
+            className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
+              activeTab === 'support'
+                ? 'text-blue-600'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Bushman Support
+            {activeTab === 'support' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('customer')}
+            className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
+              activeTab === 'customer'
+                ? 'text-blue-600'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Customer
+            {activeTab === 'customer' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('team')}
+            className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
+              activeTab === 'team'
+                ? 'text-blue-600'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Team
+            {activeTab === 'team' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 pb-24 max-w-2xl mx-auto w-full">
+        <div className="space-y-4">
+          {messages.map((message) => {
+            const isCustomer = message.senderId === 'customer';
+            const avatar = isCustomer ? customerAvatar : contractorAvatar;
+            const senderLabel = isCustomer ? 'Customer' : 'Contractor';
+
+            return (
+              <div
+                key={message.id}
+                className={`flex gap-3 ${isCustomer ? '' : 'flex-row-reverse'}`}
+              >
+                <div className="flex-shrink-0">
+                  <img
+                    src={avatar}
+                    alt={senderLabel}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                </div>
+
+                <div className={`flex flex-col ${isCustomer ? 'items-start' : 'items-end'} max-w-[75%]`}>
+                  <span className="text-xs text-slate-500 mb-1 px-1">{senderLabel}</span>
+
+                  {message.text && (
+                    <div
+                      className={`px-4 py-3 rounded-2xl ${
+                        isCustomer
+                          ? 'bg-white text-slate-900 rounded-tl-sm shadow-sm'
+                          : 'bg-blue-600 text-white rounded-tr-sm shadow-md'
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed">{message.text}</p>
+                    </div>
+                  )}
+
+                  {message.image && (
+                    <div className="rounded-2xl overflow-hidden shadow-md mt-2">
+                      <img
+                        src={message.image}
+                        alt="Shared image"
+                        className="max-w-full h-auto max-h-64 object-cover"
+                      />
+                    </div>
+                  )}
+
+                  {message.attachment && (
+                    <div className="bg-white rounded-2xl p-4 shadow-md mt-2 flex items-center gap-3 min-w-[200px]">
+                      <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 bg-slate-200 rounded"></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-900 text-sm truncate">
+                          {message.attachment.name}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 pb-20">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center gap-2">
+            <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="Search messages..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Type a message..."
+                className="w-full pl-4 pr-24 py-3 bg-slate-50 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSendMessage();
+                  }
+                }}
               />
-            </div>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto p-0">
-            <div className="divide-y">
-              {conversations.map((conversation) => (
-                <div 
-                  key={conversation.id}
-                  className={`p-4 cursor-pointer transition-colors ${
-                    activeConversation === conversation.id 
-                      ? 'bg-blue-50' 
-                      : 'hover:bg-slate-50'
-                  }`}
-                  onClick={() => setActiveConversation(conversation.id)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <Avatar>
-                        <AvatarFallback>{conversation.participantAvatar}</AvatarFallback>
-                      </Avatar>
-                      {conversation.unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
-                          {conversation.unreadCount}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-medium truncate">{conversation.participantName}</h3>
-                        <span className="text-xs text-slate-500">
-                          {formatConversationTime(conversation.lastMessageTime)}
-                        </span>
-                      </div>
-                      <p className={`text-sm truncate ${
-                        conversation.unreadCount > 0 
-                          ? 'font-medium text-slate-900' 
-                          : 'text-slate-500'
-                      }`}>
-                        {conversation.lastMessage}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Message thread */}
-        <Card className="md:col-span-2 overflow-hidden flex flex-col">
-          {activeConversation ? (
-            <>
-              {/* Conversation header */}
-              <CardHeader className="pb-3 border-b">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>{activeParticipant?.participantAvatar}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <CardTitle className="text-base">{activeParticipant?.participantName}</CardTitle>
-                      <p className="text-xs text-slate-500">Online now</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Phone className="h-5 w-5" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Video className="h-5 w-5" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {activeMessages.map((message) => {
-                  const isCurrentUser = message.senderId === 'currentUser';
-                  
-                  return (
-                    <div 
-                      key={message.id}
-                      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div 
-                        className={`max-w-[80%] p-3 rounded-lg ${
-                          isCurrentUser 
-                            ? 'bg-blue-500 text-white rounded-br-none' 
-                            : 'bg-slate-100 text-slate-800 rounded-bl-none'
-                        }`}
-                      >
-                        <p>{message.text}</p>
-                        <div 
-                          className={`text-xs mt-1 ${
-                            isCurrentUser ? 'text-blue-100' : 'text-slate-500'
-                          }`}
-                        >
-                          {formatMessageTime(message.timestamp)}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                <button className="p-2 hover:bg-slate-200 rounded-full transition-colors">
+                  <ImageIcon className="w-5 h-5 text-slate-500" />
+                </button>
+                <button className="p-2 hover:bg-slate-200 rounded-full transition-colors">
+                  <LinkIcon className="w-5 h-5 text-slate-500" />
+                </button>
               </div>
-              
-              {/* Message input */}
-              <div className="p-3 border-t">
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="icon">
-                    <Paperclip className="h-5 w-5" />
-                  </Button>
-                  <input
-                    type="text"
-                    placeholder="Type a message..."
-                    className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSendMessage();
-                      }
-                    }}
-                  />
-                  <Button 
-                    size="icon"
-                    onClick={handleSendMessage}
-                    disabled={!messageText.trim()}
-                  >
-                    <Send className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                <Send className="h-8 w-8 text-slate-400" />
-              </div>
-              <h3 className="font-medium mb-1">No conversation selected</h3>
-              <p className="text-sm text-slate-500 max-w-md">
-                Select a conversation from the list to start messaging or create a new conversation.
-              </p>
-              <Button className="mt-4">New Message</Button>
             </div>
-          )}
-        </Card>
+            <button
+              onClick={handleSendMessage}
+              disabled={!messageText.trim()}
+              className="w-12 h-12 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 rounded-full flex items-center justify-center transition-colors shadow-lg"
+            >
+              <Send className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
