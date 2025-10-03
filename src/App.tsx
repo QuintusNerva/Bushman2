@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { JobSidebar } from './components/jobs/JobSidebar';
 import { InteractiveMap } from './components/map/InteractiveMap';
 import { BottomNav } from './components/layout/BottomNav';
-import { JobBoard } from './components/jobs/JobBoard';
 import { CalendarView } from './components/calendar/CalendarView';
 import { StoreView } from './components/store/StoreView';
 import { MessagesView } from './components/messages/MessagesView';
@@ -12,7 +11,6 @@ import { Job } from './types';
 import { mockJobs } from './data/mockData';
 
 function App() {
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('jobs');
 
@@ -21,22 +19,20 @@ function App() {
 
   // Add scheduled dates to some mock jobs for today's schedule
   const today = new Date();
-  const enhancedMockJobs = mockJobs.map((job, index) => {
-    // Add scheduled dates to a few jobs for today at different hours
+  const enhancedMockJobs: Job[] = mockJobs.map((job, index) => {
     if (index % 3 === 0) {
       const scheduledDate = new Date(today);
-      scheduledDate.setHours(9 + (index % 8), 0, 0, 0); // Distribute between 9 AM and 4 PM
+      scheduledDate.setHours(9 + (index % 8), 0, 0, 0);
       return {
         ...job,
         scheduledDate,
-        status: index % 2 === 0 ? 'scheduled' : 'claimed'
+        status: index % 2 === 0 ? ('scheduled' as const) : ('claimed' as const)
       };
     }
     return job;
   });
 
   const handleJobSelect = (job: Job) => {
-    setSelectedJob(job);
     setSidebarOpen(true);
     console.log('Selected job:', job);
   };
@@ -60,65 +56,67 @@ function App() {
     switch (activeTab) {
       case 'jobs':
         return (
-          <div className="space-y-4">
-            <h1 className="text-2xl font-bold text-slate-800">Available Jobs</h1>
-            
-            {/* User profile card - Now clickable */}
-            <div 
-              className="bg-white rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-all duration-200"
-              onClick={navigateToProfile}
-            >
-              <div className="p-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                    JS
-                  </div>
-                  <div>
-                    <h3 className="font-medium">John Smith</h3>
-                    <div className="flex items-center text-sm">
-                      <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
-                      <span className="text-slate-600">Available</span>
-                    </div>
-                  </div>
-                  <div className="ml-auto flex gap-8 text-center">
-                    <div>
-                      <div className="text-blue-500 font-semibold text-lg">5</div>
-                      <div className="text-xs text-slate-500">Available</div>
-                    </div>
-                    <div>
-                      <div className="text-green-600 font-semibold text-lg">4</div>
-                      <div className="text-xs text-slate-500">Claimed</div>
-                    </div>
-                    <div>
-                      <div className="text-green-600 font-semibold text-lg">$1240</div>
-                      <div className="text-xs text-slate-500">Today</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Map with sidebar toggle */}
-            <div className="relative mb-4">
-              <InteractiveMap 
-                jobs={enhancedMockJobs} 
-                suppliers={[]} 
-                onJobSelect={handleJobSelect} 
+          <div className="relative h-full">
+            {/* Full-screen Map Background */}
+            <div className="absolute inset-0 z-0">
+              <InteractiveMap
+                jobs={enhancedMockJobs}
+                suppliers={[]}
+                onJobSelect={handleJobSelect}
                 onToggleSidebar={toggleSidebar}
                 sidebarOpen={sidebarOpen}
-                className="h-[400px] md:h-[500px] w-full z-0"
+                className="h-full w-full"
               />
-              
-              <JobSidebar 
-                jobs={enhancedMockJobs.filter(job => job.status === 'unclaimed')} 
+
+              <JobSidebar
+                jobs={enhancedMockJobs.filter(job => job.status === 'unclaimed')}
                 onJobSelect={handleJobSelect}
                 open={sidebarOpen}
                 onOpenChange={setSidebarOpen}
               />
             </div>
-            
-            {/* Today's Schedule - Using the TodaysSchedule component */}
-            <TodaysSchedule jobs={enhancedMockJobs} contractorLocation={contractorLocation} />
+
+            {/* Overlaid Header - Transparent */}
+            <div className="absolute top-0 left-0 right-0 z-10 p-4">
+              <div
+                className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 border border-white/50"
+                onClick={navigateToProfile}
+              >
+                <div className="p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                      JS
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-slate-800">John Smith</h3>
+                      <div className="flex items-center text-sm">
+                        <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
+                        <span className="text-slate-700">Available</span>
+                      </div>
+                    </div>
+                    <div className="ml-auto flex gap-8 text-center">
+                      <div>
+                        <div className="text-blue-500 font-semibold text-lg">5</div>
+                        <div className="text-xs text-slate-600">Available</div>
+                      </div>
+                      <div>
+                        <div className="text-green-600 font-semibold text-lg">4</div>
+                        <div className="text-xs text-slate-600">Claimed</div>
+                      </div>
+                      <div>
+                        <div className="text-green-600 font-semibold text-lg">$1240</div>
+                        <div className="text-xs text-slate-600">Today</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Overlaid Today's Schedule - Transparent */}
+            <div className="absolute bottom-0 left-0 right-0 z-10 p-4">
+              <TodaysSchedule jobs={enhancedMockJobs} contractorLocation={contractorLocation} />
+            </div>
           </div>
         );
       case 'calendar':
@@ -136,10 +134,10 @@ function App() {
 
   return (
     <div className="app-container bg-slate-50 min-h-screen pb-20">
-      <div className="p-4">
+      <div className="h-[calc(100vh-5rem)]">
         {renderTabContent()}
       </div>
-      
+
       {/* Bottom Navigation */}
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
     </div>

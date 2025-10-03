@@ -91,23 +91,23 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
   };
 
   return (
-    <div className="clay-card p-4 mb-6">
+    <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-4 border border-white/50">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-slate-800">Today's Schedule</h2>
       </div>
-      
+
       <div className="scrollable-content flex overflow-x-auto gap-3 pb-2" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
         {timeSlots.map((time, index) => {
           const job = getJobForTimeSlot(time);
-          
+
           return (
             <div key={index} className="flex-shrink-0 w-[160px]">
               <div className="text-sm font-medium text-slate-700 mb-1">
                 {formatTime(time)}
               </div>
-              
+
               {job ? (
-                <div 
+                <div
                   className={`clay-card-sm p-3 cursor-pointer hover:shadow-md border-l-4 ${getJobTypeColor(job.type)}`}
                   onClick={() => handleJobClick(job)}
                 >
@@ -133,11 +133,11 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
           );
         })}
       </div>
-      
+
       <div className="swipe-indicator mt-2 text-center text-slate-400 text-xs">
         Swipe for more <ChevronRight className="inline h-3 w-3" />
       </div>
-      
+
       {/* Job details modal */}
       <JobDetailsModal
         job={selectedJob}
