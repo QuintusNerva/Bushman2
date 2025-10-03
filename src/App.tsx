@@ -79,34 +79,35 @@ function App() {
             {/* Overlaid Header - Transparent */}
             <div className="absolute top-0 left-0 right-0 z-10 p-4">
               <div
-                className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 border border-white/50"
+                className="bg-white/95 backdrop-blur-md rounded-3xl shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200"
                 onClick={navigateToProfile}
               >
-                <div className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                      JS
+                <div className="p-5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <img
+                      src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100"
+                      alt="Ethan Carter"
+                      className="w-14 h-14 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm text-slate-600 font-medium">Technician</p>
+                      <h3 className="text-lg font-bold text-slate-900">Ethan Carter</h3>
                     </div>
-                    <div>
-                      <h3 className="font-medium text-slate-800">John Smith</h3>
-                      <div className="flex items-center text-sm">
-                        <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
-                        <span className="text-slate-700">Available</span>
-                      </div>
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-blue-50/80 rounded-2xl p-4 text-center">
+                      <p className="text-sm text-blue-600 font-semibold mb-1">Scheduled</p>
+                      <p className="text-3xl font-bold text-slate-900">3</p>
                     </div>
-                    <div className="ml-auto flex gap-8 text-center">
-                      <div>
-                        <div className="text-blue-500 font-semibold text-lg">5</div>
-                        <div className="text-xs text-slate-600">Available</div>
-                      </div>
-                      <div>
-                        <div className="text-green-600 font-semibold text-lg">4</div>
-                        <div className="text-xs text-slate-600">Claimed</div>
-                      </div>
-                      <div>
-                        <div className="text-green-600 font-semibold text-lg">$1240</div>
-                        <div className="text-xs text-slate-600">Today</div>
-                      </div>
+                    <div className="bg-green-50/80 rounded-2xl p-4 text-center">
+                      <p className="text-sm text-green-600 font-semibold mb-1">Available</p>
+                      <p className="text-3xl font-bold text-slate-900">2</p>
+                    </div>
+                    <div className="bg-blue-50/80 rounded-2xl p-4 text-center">
+                      <p className="text-sm text-blue-600 font-semibold mb-1">Earnings</p>
+                      <p className="text-3xl font-bold text-slate-900">$450</p>
                     </div>
                   </div>
                 </div>
