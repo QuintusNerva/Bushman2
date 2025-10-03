@@ -153,11 +153,11 @@ export function InteractiveMap({
   return (
     <>
       <div className={`relative ${className}`}>
-        <MapContainer 
-          center={getMapCenter() as [number, number]} 
-          zoom={12} 
+        <MapContainer
+          center={getMapCenter() as [number, number]}
+          zoom={12}
           style={{ height: '100%', width: '100%', borderRadius: '0.75rem' }}
-          whenCreated={(map) => { mapRef.current = map; }}
+          ref={mapRef as any}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

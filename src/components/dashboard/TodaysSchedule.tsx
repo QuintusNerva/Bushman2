@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Job } from '@/types';
 import { JobDetailsModal } from '@/components/job/JobDetailsModal';
-import { ChevronRight } from 'lucide-react';
 
 interface TodaysScheduleProps {
   jobs: Job[];
@@ -12,51 +11,28 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Get today's date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Filter jobs for today
   const todaysJobs = jobs.filter(job => {
     if (!job.scheduledDate) return false;
-    
+
     const jobDate = new Date(job.scheduledDate);
     jobDate.setHours(0, 0, 0, 0);
-    
-    return jobDate.getTime() === today.getTime() && 
+
+    return jobDate.getTime() === today.getTime() &&
            (job.status === 'scheduled' || job.status === 'claimed');
   });
 
-  // Generate time slots from 8 AM to 5 PM
-  const timeSlots = [];
-  for (let hour = 8; hour <= 17; hour++) {
-    const time = new Date();
-    time.setHours(hour, 0, 0, 0);
-    timeSlots.push(time);
-  }
-
-  // Get job for a specific time slot
-  const getJobForTimeSlot = (time: Date) => {
-    return todaysJobs.find(job => {
-      if (!job.scheduledDate) return false;
-      
-      const jobTime = new Date(job.scheduledDate);
-      return jobTime.getHours() === time.getHours();
-    });
-  };
-
-  // Handle job click
   const handleJobClick = (job: Job) => {
     setSelectedJob(job);
     setIsModalOpen(true);
   };
 
-  // Handle modal close
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
-  // Handle job accept/reject (placeholder functions)
   const handleAcceptJob = (jobId: string) => {
     console.log('Accept job:', jobId);
     setIsModalOpen(false);
@@ -67,78 +43,76 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
     setIsModalOpen(false);
   };
 
-  // Get job type color
-  const getJobTypeColor = (type: string) => {
+  const getJobTypeBadgeColor = (type: string) => {
     switch (type) {
       case 'UV':
-        return 'border-amber-400 bg-amber-50';
+        return 'bg-amber-500 text-white';
       case 'RO':
-        return 'border-blue-400 bg-blue-50';
+        return 'bg-orange-500 text-white';
       case 'Softener':
-        return 'border-green-400 bg-green-50';
+        return 'bg-blue-500 text-white';
       case 'Whole House':
-        return 'border-purple-400 bg-purple-50';
+        return 'bg-green-500 text-white';
       case 'Commercial':
-        return 'border-red-400 bg-red-50';
+        return 'bg-red-500 text-white';
       default:
-        return 'border-slate-400 bg-slate-50';
+        return 'bg-slate-500 text-white';
     }
   };
 
-  // Format time for display
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const formatJobType = (type: string) => {
+    if (type === 'RO') return 'RO SYSTEM';
+    if (type === 'UV') return 'UV SYSTEM';
+    return type.toUpperCase().replace(' ', ' ');
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-4 border border-white/50">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-slate-800">Today's Schedule</h2>
-      </div>
+    <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg px-4 py-3 border border-white/50">
+      <h2 className="text-lg font-bold text-slate-800 mb-3">Today's Schedule</h2>
 
-      <div className="scrollable-content flex overflow-x-auto gap-3 pb-2" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
-        {timeSlots.map((time, index) => {
-          const job = getJobForTimeSlot(time);
+      <div
+        className="flex overflow-x-auto gap-3 pb-2 -mx-1 px-1"
+        style={{
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        <style>{`
+          .scrollable-content::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
 
-          return (
-            <div key={index} className="flex-shrink-0 w-[160px]">
-              <div className="text-sm font-medium text-slate-700 mb-1">
-                {formatTime(time)}
+        {todaysJobs.length > 0 ? (
+          todaysJobs.map((job) => (
+            <div
+              key={job.id}
+              className="flex-shrink-0 w-[240px] bg-white rounded-2xl shadow-md cursor-pointer hover:shadow-lg transition-all duration-200 overflow-hidden border border-slate-200"
+              onClick={() => handleJobClick(job)}
+            >
+              <div className="p-4">
+                <h3 className="font-bold text-slate-900 text-base mb-1">
+                  {job.customer.name}
+                </h3>
+                <p className="text-sm text-slate-600 mb-3 line-clamp-1">
+                  {job.location.address}
+                </p>
+                <div className="inline-block">
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${getJobTypeBadgeColor(job.type)}`}>
+                    {formatJobType(job.type)}
+                  </span>
+                </div>
               </div>
-
-              {job ? (
-                <div
-                  className={`clay-card-sm p-3 cursor-pointer hover:shadow-md border-l-4 ${getJobTypeColor(job.type)}`}
-                  onClick={() => handleJobClick(job)}
-                >
-                  <div className="font-medium text-slate-800 mb-1">
-                    {job.title}
-                  </div>
-                  <div className="text-sm text-blue-500">
-                    {job.customer.name}
-                  </div>
-                  <div className="text-xs text-slate-500 truncate mt-1">
-                    {job.location.address}
-                  </div>
-                  {job.priority === 'urgent' && (
-                    <div className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></div>
-                  )}
-                </div>
-              ) : (
-                <div className="clay-card-sm p-3 border border-dashed border-slate-300 bg-slate-50 text-slate-400 flex items-center justify-center h-[90px]">
-                  <span className="text-sm">Available</span>
-                </div>
-              )}
             </div>
-          );
-        })}
+          ))
+        ) : (
+          <div className="flex-shrink-0 w-[240px] bg-white/50 rounded-2xl border-2 border-dashed border-slate-300 p-6 flex items-center justify-center">
+            <p className="text-slate-400 text-sm font-medium">No jobs scheduled</p>
+          </div>
+        )}
       </div>
 
-      <div className="swipe-indicator mt-2 text-center text-slate-400 text-xs">
-        Swipe for more <ChevronRight className="inline h-3 w-3" />
-      </div>
-
-      {/* Job details modal */}
       <JobDetailsModal
         job={selectedJob}
         isOpen={isModalOpen}
