@@ -118,9 +118,15 @@ export function InteractiveMap({
   };
 
   const formatJobType = (type: string) => {
-    return type.split('_').map(word =>
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    // Handle special cases for job types
+    const typeMap: Record<string, string> = {
+      'RO': 'Reverse Osmosis System',
+      'UV': 'UV Light System',
+      'Softener': 'Water Softener',
+      'Whole House': 'Whole House System',
+      'Commercial': 'Commercial System'
+    };
+    return typeMap[type] || type;
   };
 
   const formatScheduledTime = (job: Job) => {
@@ -217,7 +223,7 @@ export function InteractiveMap({
       </div>
 
       {/* Job Details Modal */}
-      {selectedJob && (
+      {selectedJob && selectedJob.customer && selectedJob.location && (
         <PopupCard
           isOpen={true}
           onClose={handleCloseJobCard}
@@ -287,32 +293,32 @@ export function InteractiveMap({
                   <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <p className="text-sm font-medium text-slate-700">Duration</p>
-                    <p className="text-slate-900">{selectedJob.estimatedDuration} minutes</p>
+                    <p className="text-slate-900">{selectedJob.estimatedDuration} {selectedJob.estimatedDuration === 1 ? 'hour' : 'hours'}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <Navigation className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700">Distance</p>
+                    <p className="text-sm font-medium text-slate-700">Distance & Drive Time</p>
                     <p className="text-slate-900">
-                      {calculateDistance(selectedJob.location.lat, selectedJob.location.lng)} miles from your location
+                      {calculateDistance(selectedJob.location.lat, selectedJob.location.lng)} miles
+                      <span className="text-slate-600"> • ~{calculateDriveTime(parseFloat(calculateDistance(selectedJob.location.lat, selectedJob.location.lng)))} min drive</span>
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-2 pt-4 border-t">
+            <div className="flex gap-3 pt-4 border-t">
               <Button onClick={handleCloseJobCard} variant="outline" className="flex-1">
                 Close
               </Button>
               <Button
                 onClick={() => {
                   handleAcceptJob(selectedJob.id);
-                  handleCloseJobCard();
                 }}
-                className="flex-1"
+                className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
               >
                 Accept Job
               </Button>
