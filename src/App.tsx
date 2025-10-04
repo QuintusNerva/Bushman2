@@ -92,37 +92,39 @@ function App() {
               />
             </div>
 
-            {/* Overlaid Header - Optimized */}
-            <div className="absolute top-0 left-0 right-0 z-10 p-4">
+            {/* Profile Card - Reference Design Match */}
+            <div className="absolute top-0 left-0 right-0 z-10 p-3">
               <div
-                className="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 max-w-3xl mx-auto"
+                className="bg-gradient-to-br from-white/98 to-slate-50/95 backdrop-blur-xl rounded-[24px] shadow-2xl cursor-pointer hover:shadow-3xl transition-all duration-300 mx-3 border border-white/20"
                 onClick={navigateToProfile}
+                style={{ maxWidth: '680px', margin: '0 auto' }}
               >
-                <div className="px-4 py-3">
-                  <div className="flex items-center gap-3">
+                <div className="px-5 py-4">
+                  <div className="flex items-start gap-4 mb-4">
                     <img
                       src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100"
                       alt="Ethan Carter"
-                      className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                      className="w-14 h-14 rounded-full object-cover flex-shrink-0 ring-2 ring-white shadow-md"
                     />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-slate-600 font-medium">Technician</p>
-                      <h3 className="text-base font-bold text-slate-900">Ethan Carter</h3>
+                    <div className="flex-1 min-w-0 pt-0.5">
+                      <p className="text-xs text-slate-500 font-medium tracking-wide uppercase mb-1">Technician</p>
+                      <h3 className="text-xl font-bold text-slate-900 leading-tight">Ethan Carter</h3>
                     </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <div className="text-center px-3">
-                        <p className="text-xs text-blue-600 font-semibold mb-0.5">Scheduled</p>
-                        <p className="text-xl font-bold text-slate-900">3</p>
-                      </div>
-                      <div className="text-center px-3">
-                        <p className="text-xs text-green-600 font-semibold mb-0.5">Available</p>
-                        <p className="text-xl font-bold text-slate-900">2</p>
-                      </div>
-                      <div className="text-center px-3">
-                        <p className="text-xs text-blue-600 font-semibold mb-0.5">Earnings</p>
-                        <p className="text-xl font-bold text-slate-900">$450</p>
-                      </div>
-                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full ml-2"></div>
+                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0 mt-1.5 shadow-lg ring-4 ring-blue-100"></div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-blue-50/80 rounded-2xl px-4 py-3 text-center backdrop-blur-sm border border-blue-100/50 shadow-sm">
+                      <p className="text-sm text-blue-600 font-semibold mb-1.5 tracking-wide">Scheduled</p>
+                      <p className="text-3xl font-bold text-slate-900">3</p>
+                    </div>
+                    <div className="bg-green-50/80 rounded-2xl px-4 py-3 text-center backdrop-blur-sm border border-green-100/50 shadow-sm">
+                      <p className="text-sm text-green-600 font-semibold mb-1.5 tracking-wide">Available</p>
+                      <p className="text-3xl font-bold text-slate-900">2</p>
+                    </div>
+                    <div className="bg-purple-50/80 rounded-2xl px-4 py-3 text-center backdrop-blur-sm border border-purple-100/50 shadow-sm">
+                      <p className="text-sm text-purple-600 font-semibold mb-1.5 tracking-wide">Earnings</p>
+                      <p className="text-3xl font-bold text-slate-900">$450</p>
                     </div>
                   </div>
                 </div>
