@@ -49,8 +49,10 @@ export const useGeofence = ({
 
   useEffect(() => {
     if (!enabled || !currentLocation) {
-      setGeofenceActive(false);
-      resetGeofenceTimer();
+      if (travelUI.isGeofenceActive || travelUI.geofenceTimer > 0) {
+        setGeofenceActive(false);
+        resetGeofenceTimer();
+      }
       return;
     }
 
@@ -65,16 +67,22 @@ export const useGeofence = ({
     const speedBelowThreshold = currentSpeed < MAX_SPEED_MPS;
     const isInGeofence = withinRadius && speedBelowThreshold;
 
-    setGeofenceActive(isInGeofence);
+    if (travelUI.isGeofenceActive !== isInGeofence) {
+      setGeofenceActive(isInGeofence);
+    }
 
-    if (!isInGeofence) {
+    if (!isInGeofence && travelUI.geofenceTimer > 0) {
       resetGeofenceTimer();
     }
   }, [
-    currentLocation,
-    destinationLocation,
+    currentLocation?.lat,
+    currentLocation?.lng,
+    destinationLocation.lat,
+    destinationLocation.lng,
     currentSpeed,
     enabled,
+    travelUI.isGeofenceActive,
+    travelUI.geofenceTimer,
     setGeofenceActive,
     resetGeofenceTimer,
   ]);

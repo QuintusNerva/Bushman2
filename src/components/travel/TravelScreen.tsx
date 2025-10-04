@@ -25,11 +25,11 @@ interface TravelScreenProps {
 }
 
 export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProps) {
-  const { position } = useGeolocation();
+  const { position } = useGeolocation({ enableWatch: true, enableHighAccuracy: true });
   const [currentSpeed, setCurrentSpeed] = useState(0);
 
   const currentLocation = position
-    ? { lat: position.coords.latitude, lng: position.coords.longitude }
+    ? { lat: position.lat, lng: position.lng }
     : null;
 
   const destinationLocation = {
@@ -63,15 +63,13 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
   });
 
   useEffect(() => {
-    if (travelState === 'ACCEPTED') {
+    if (travelState === 'ACCEPTED' && currentLocation) {
       handleStartTravel();
     }
-  }, []);
+  }, [travelState, currentLocation, handleStartTravel]);
 
   useEffect(() => {
-    if (position?.coords.speed !== null && position?.coords.speed !== undefined) {
-      setCurrentSpeed(position.coords.speed);
-    }
+    setCurrentSpeed(0);
   }, [position]);
 
   const distance = route?.distance || 0;
@@ -93,6 +91,20 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
       '_blank'
     );
   };
+
+  if (!currentLocation && travelState === 'ACCEPTED') {
+    return (
+      <div className="relative h-screen w-full bg-slate-50 flex items-center justify-center">
+        <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8 max-w-md mx-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Getting your location...</h3>
+            <p className="text-sm text-slate-600">Please allow location access to start travel</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-screen w-full bg-slate-50">
