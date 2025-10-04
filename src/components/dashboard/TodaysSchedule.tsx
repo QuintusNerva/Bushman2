@@ -95,9 +95,9 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
   };
 
   return (
-    <div className="px-3 py-4">
+    <div className="px-2 py-2">
       <h2
-        className="text-xl font-bold mb-4 px-2"
+        className="text-sm font-bold mb-2 px-1.5"
         style={{
           color: '#FFFFFF',
           textShadow: '0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.4)',
@@ -108,12 +108,12 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
       </h2>
 
       <div
-        className="flex overflow-x-auto gap-4 pb-3 px-2 snap-x snap-mandatory"
+        className="flex overflow-x-auto gap-2.5 pb-2 px-1.5 snap-x snap-mandatory"
         style={{
           msOverflowStyle: 'none',
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
-          scrollPaddingLeft: '8px'
+          scrollPaddingLeft: '6px'
         }}
       >
         <style>{`
@@ -126,31 +126,31 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
           todaysJobs.map((job) => (
             <div
               key={job.id}
-              className={`flex-shrink-0 w-[320px] bg-white/98 backdrop-blur-xl rounded-[20px] shadow-xl cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden border-l-[6px] snap-start ${getJobTypeAccentColor(job.type)}`}
+              className={`flex-shrink-0 w-[220px] bg-white/98 backdrop-blur-xl rounded-[14px] shadow-lg cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden border-l-[4px] snap-start ${getJobTypeAccentColor(job.type)}`}
               onClick={() => handleJobClick(job)}
             >
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <div className="p-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     {formatTime(job.scheduledDate)}
                   </p>
                 </div>
 
-                <h3 className="font-bold text-slate-900 text-lg mb-2 leading-tight">
+                <h3 className="font-bold text-slate-900 text-sm mb-1.5 leading-tight">
                   {job.customer.name}
                 </h3>
-                <p className="text-sm text-slate-500 mb-4 line-clamp-1 leading-relaxed">
+                <p className="text-xs text-slate-500 mb-2 line-clamp-1 leading-relaxed">
                   {job.location.address}
                 </p>
-                <p className={`text-sm font-bold uppercase tracking-wider ${getJobTypeTextColor(job.type)}`}>
+                <p className={`text-[10px] font-bold uppercase tracking-wider ${getJobTypeTextColor(job.type)}`}>
                   {formatJobType(job.type)}
                 </p>
               </div>
             </div>
           ))
         ) : (
-          <div className="flex-shrink-0 w-[320px] bg-white/90 backdrop-blur-xl rounded-[20px] border-2 border-dashed border-white/70 p-8 flex items-center justify-center shadow-lg snap-start">
-            <p className="text-white text-base font-semibold drop-shadow-lg">No jobs scheduled</p>
+          <div className="flex-shrink-0 w-[220px] bg-white/90 backdrop-blur-xl rounded-[14px] border-2 border-dashed border-white/70 p-4 flex items-center justify-center shadow-lg snap-start">
+            <p className="text-white text-sm font-semibold drop-shadow-lg">No jobs scheduled</p>
           </div>
         )}
       </div>
