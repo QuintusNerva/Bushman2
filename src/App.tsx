@@ -93,7 +93,7 @@ function App() {
             </div>
 
             {/* Profile Card - Scaled Down */}
-            <div className="absolute top-0 left-0 right-0 z-10 p-2">
+            <div className="absolute top-0 left-0 right-0 z-[100] p-2">
               <div
                 className="bg-gradient-to-br from-white/98 to-slate-50/95 backdrop-blur-xl rounded-[18px] shadow-xl cursor-pointer hover:shadow-2xl transition-all duration-300 mx-2 border border-white/20"
                 onClick={navigateToProfile}
@@ -132,7 +132,7 @@ function App() {
             </div>
 
             {/* Overlaid Today's Schedule - Transparent */}
-            <div className="absolute bottom-0 left-0 right-0 z-10 p-4">
+            <div className="absolute bottom-0 left-0 right-0 z-[100] p-4">
               <TodaysSchedule jobs={enhancedMockJobs} contractorLocation={contractorLocation} />
             </div>
           </div>
