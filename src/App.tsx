@@ -10,7 +10,7 @@ import { TodaysSchedule } from './components/dashboard/TodaysSchedule';
 import { PopupCard } from './components/ui/popup-card';
 import { Button } from './components/ui/button';
 import { MapPin as MapPinIcon, Phone, Clock, Wrench, Navigation } from 'lucide-react';
-import { Job } from './types';
+import { Job, Supplier } from './types';
 import { mockJobs, mockSuppliers } from './data/mockData';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useOffline } from './hooks/useOffline';
@@ -21,6 +21,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('jobs');
   const [selectedMapJob, setSelectedMapJob] = useState<Job | null>(null);
+  const [selectedMapSupplier, setSelectedMapSupplier] = useState<Supplier | null>(null);
 
   const { position, error: geoError, getCurrentPosition } = useGeolocation();
   const { isOnline, wasOffline, cacheData, getCachedData } = useOffline();
@@ -150,7 +151,9 @@ function App() {
                 sidebarOpen={sidebarOpen}
                 className="h-full w-full"
                 onJobMarkerClick={setSelectedMapJob}
+                onSupplierMarkerClick={setSelectedMapSupplier}
                 selectedJobId={selectedMapJob?.id || null}
+                selectedSupplierId={selectedMapSupplier?.id || null}
               />
 
               <JobSidebar
@@ -351,6 +354,113 @@ function App() {
                 className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
               >
                 Accept Job
+              </Button>
+            </div>
+          </div>
+        </PopupCard>
+      )}
+
+      {/* Supply House Details Modal - Rendered at root level for proper z-index */}
+      {selectedMapSupplier && (
+        <PopupCard
+          isOpen={true}
+          onClose={() => setSelectedMapSupplier(null)}
+          title={selectedMapSupplier.name}
+          maxWidth="600px"
+          aria-label={`Supply house details for ${selectedMapSupplier.name}`}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-4xl">🏢</div>
+              <h3 className="text-xl font-bold text-slate-900">{selectedMapSupplier.name}</h3>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <MapPinIcon className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Address</p>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedMapSupplier.location.lat},${selectedMapSupplier.location.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    {selectedMapSupplier.address}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Phone className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Phone</p>
+                  <a
+                    href={`tel:${selectedMapSupplier.phone}`}
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    {selectedMapSupplier.phone}
+                  </a>
+                </div>
+              </div>
+
+              <div className="border-t pt-3">
+                <div className="flex items-start gap-3 mb-3">
+                  <Clock className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Hours Today</p>
+                    <p className="text-slate-900">
+                      {selectedMapSupplier.hours ? `${selectedMapSupplier.hours.open} - ${selectedMapSupplier.hours.close}` : 'Hours not available'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mb-3">
+                  <Navigation className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Distance</p>
+                    <p className="text-slate-900">
+                      {calculateDistance(selectedMapSupplier.location.lat, selectedMapSupplier.location.lng)} miles
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Drive Time</p>
+                    <p className="text-slate-900">
+                      ~{calculateDriveTime(parseFloat(calculateDistance(selectedMapSupplier.location.lat, selectedMapSupplier.location.lng)))} minutes
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-4 border-t">
+              <Button onClick={() => setSelectedMapSupplier(null)} variant="outline" className="flex-1">
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  window.open(
+                    `https://www.google.com/maps/dir/?api=1&destination=${selectedMapSupplier.location.lat},${selectedMapSupplier.location.lng}`,
+                    '_blank'
+                  );
+                }}
+                className="flex-1"
+              >
+                <Navigation className="w-4 h-4 mr-2" />
+                Get Directions
+              </Button>
+              <Button
+                onClick={() => {
+                  window.location.href = `tel:${selectedMapSupplier.phone}`;
+                }}
+                variant="secondary"
+              >
+                <Phone className="w-4 h-4 mr-2" />
+                Call
               </Button>
             </div>
           </div>
