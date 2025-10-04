@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ZoomController } from './ZoomController';
 import { createJobMarker, createSupplierMarker, createContractorMarker, PIN_COLORS } from './MapMarkers';
-import { EnhancedJobCard } from './EnhancedJobCard';
-import { EnhancedSupplyCard } from './EnhancedSupplyCard';
+import { PopupCard } from '@/components/ui/popup-card';
+import { MapPin, Phone, Clock, Wrench, Navigation } from 'lucide-react';
 
 
 interface MapControlsProps {
@@ -59,7 +59,6 @@ export function InteractiveMap({
 }: InteractiveMapProps) {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
-  const [cardPosition, setCardPosition] = useState<{ x: number; y: number } | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   
   // Mock contractor location (Orlando)
@@ -78,24 +77,14 @@ export function InteractiveMap({
     return [centerLat, centerLng];
   };
   
-  const handleJobMarkerClick = (job: Job, event: L.LeafletMouseEvent) => {
+  const handleJobMarkerClick = (job: Job) => {
     setSelectedJob(job);
     setSelectedSupplier(null);
-
-    const point = mapRef.current?.latLngToContainerPoint(event.latlng);
-    if (point) {
-      setCardPosition({ x: point.x + 40, y: point.y - 20 });
-    }
   };
 
-  const handleSupplierMarkerClick = (supplier: Supplier, event: L.LeafletMouseEvent) => {
+  const handleSupplierMarkerClick = (supplier: Supplier) => {
     setSelectedSupplier(supplier);
     setSelectedJob(null);
-
-    const point = mapRef.current?.latLngToContainerPoint(event.latlng);
-    if (point) {
-      setCardPosition({ x: point.x + 40, y: point.y - 20 });
-    }
   };
   
   const handleAcceptJob = (jobId: string) => {
@@ -105,20 +94,67 @@ export function InteractiveMap({
       onJobSelect(job);
     }
     setSelectedJob(null);
-    setCardPosition(null);
   };
 
   const handleCloseJobCard = () => {
     setSelectedJob(null);
-    setCardPosition(null);
   };
 
   const handleCloseSupplyCard = () => {
     setSelectedSupplier(null);
-    setCardPosition(null);
   };
-  
-  
+
+  const calculateDistance = (targetLat: number, targetLng: number) => {
+    const R = 3959;
+    const dLat = (targetLat - contractorLocation.lat) * Math.PI / 180;
+    const dLon = (targetLng - contractorLocation.lng) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(contractorLocation.lat * Math.PI / 180) *
+      Math.cos(targetLat * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return (R * c).toFixed(1);
+  };
+
+  const formatJobType = (type: string) => {
+    return type.split('_').map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
+  const formatScheduledTime = (job: Job) => {
+    if (job.status === 'unclaimed') return 'Available Now';
+    if (job.scheduledDate) {
+      const date = new Date(job.scheduledDate);
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+    }
+    return 'TBD';
+  };
+
+  const getPriorityBadgeClass = (priority: string) => {
+    const classes = {
+      low: 'bg-green-50 text-green-700 border-green-200',
+      medium: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+      high: 'bg-red-50 text-red-700 border-red-200',
+      urgent: 'bg-red-600 text-white border-red-700'
+    };
+    return classes[priority as keyof typeof classes] || classes.medium;
+  };
+
+  const calculateDriveTime = (distance: number) => {
+    const avgSpeed = 35;
+    const timeInHours = distance / avgSpeed;
+    const minutes = Math.round(timeInHours * 60);
+    return minutes < 1 ? '<1' : minutes.toString();
+  };
+
+
   return (
     <>
       <div className={`relative ${className}`}>
@@ -148,7 +184,7 @@ export function InteractiveMap({
                 position={[job.location.lat, job.location.lng]}
                 icon={createJobMarker(job.status, isSelected)}
                 eventHandlers={{
-                  click: (e) => handleJobMarkerClick(job, e),
+                  click: () => handleJobMarkerClick(job),
                 }}
               />
             );
@@ -163,7 +199,7 @@ export function InteractiveMap({
                 position={[supplier.location.lat, supplier.location.lng]}
                 icon={createSupplierMarker(isSelected)}
                 eventHandlers={{
-                  click: (e) => handleSupplierMarkerClick(supplier, e),
+                  click: () => handleSupplierMarkerClick(supplier),
                 }}
               />
             );
@@ -178,30 +214,219 @@ export function InteractiveMap({
           {/* Map controls */}
           <MapControls onToggleSidebar={onToggleSidebar} sidebarOpen={sidebarOpen} />
         </MapContainer>
-        
-        {/* Enhanced job card with 3D projection */}
-        {selectedJob && cardPosition && (
-          <EnhancedJobCard
-            job={selectedJob}
-            position={cardPosition}
-            pinColor={selectedJob.status === 'unclaimed' ? PIN_COLORS.available : PIN_COLORS.scheduled}
-            onClose={handleCloseJobCard}
-            onAccept={handleAcceptJob}
-            contractorLocation={contractorLocation}
-          />
-        )}
-
-        {/* Enhanced supply house card with 3D projection */}
-        {selectedSupplier && cardPosition && (
-          <EnhancedSupplyCard
-            supplier={selectedSupplier}
-            position={cardPosition}
-            pinColor={PIN_COLORS.supplyHouse}
-            onClose={handleCloseSupplyCard}
-            contractorLocation={contractorLocation}
-          />
-        )}
       </div>
+
+      {/* Job Details Modal */}
+      {selectedJob && (
+        <PopupCard
+          isOpen={true}
+          onClose={handleCloseJobCard}
+          title={`Job #${selectedJob.id.slice(0, 8).toUpperCase()}`}
+          maxWidth="600px"
+          aria-label={`Job details for ${selectedJob.customer.name}`}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-slate-900">{selectedJob.customer.name}</h3>
+              <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full border ${getPriorityBadgeClass(selectedJob.priority)}`}>
+                {selectedJob.priority}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Address</p>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedJob.location.lat},${selectedJob.location.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    {selectedJob.location.address}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Phone className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Phone</p>
+                  <a
+                    href={`tel:${selectedJob.customer.phone}`}
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    {selectedJob.customer.phone}
+                  </a>
+                </div>
+              </div>
+
+              <div className="border-t pt-3">
+                <div className="flex items-start gap-3 mb-3">
+                  <Wrench className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Job Type</p>
+                    <p className="text-slate-900">{formatJobType(selectedJob.type)}</p>
+                  </div>
+                </div>
+
+                {selectedJob.description && (
+                  <p className="text-sm text-slate-600 mb-3">{selectedJob.description}</p>
+                )}
+
+                <div className="flex items-start gap-3 mb-3">
+                  <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Scheduled</p>
+                    <p className="text-slate-900">{formatScheduledTime(selectedJob)}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mb-3">
+                  <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Duration</p>
+                    <p className="text-slate-900">{selectedJob.estimatedDuration} minutes</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Navigation className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Distance</p>
+                    <p className="text-slate-900">
+                      {calculateDistance(selectedJob.location.lat, selectedJob.location.lng)} miles from your location
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-4 border-t">
+              <Button onClick={handleCloseJobCard} variant="outline" className="flex-1">
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  handleAcceptJob(selectedJob.id);
+                  handleCloseJobCard();
+                }}
+                className="flex-1"
+              >
+                Accept Job
+              </Button>
+            </div>
+          </div>
+        </PopupCard>
+      )}
+
+      {/* Supply House Modal */}
+      {selectedSupplier && (
+        <PopupCard
+          isOpen={true}
+          onClose={handleCloseSupplyCard}
+          title={selectedSupplier.name}
+          maxWidth="600px"
+          aria-label={`Supply house details for ${selectedSupplier.name}`}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="text-4xl">🏢</div>
+              <h3 className="text-xl font-bold text-slate-900">{selectedSupplier.name}</h3>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Address</p>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedSupplier.location.lat},${selectedSupplier.location.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    {selectedSupplier.address}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Phone className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Phone</p>
+                  <a
+                    href={`tel:${selectedSupplier.phone}`}
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    {selectedSupplier.phone}
+                  </a>
+                </div>
+              </div>
+
+              <div className="border-t pt-3">
+                <div className="flex items-start gap-3 mb-3">
+                  <Clock className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Hours Today</p>
+                    <p className="text-slate-900">
+                      {selectedSupplier.hours ? `${selectedSupplier.hours.open} - ${selectedSupplier.hours.close}` : 'Hours not available'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mb-3">
+                  <Navigation className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Distance</p>
+                    <p className="text-slate-900">
+                      {calculateDistance(selectedSupplier.location.lat, selectedSupplier.location.lng)} miles
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Drive Time</p>
+                    <p className="text-slate-900">
+                      ~{calculateDriveTime(parseFloat(calculateDistance(selectedSupplier.location.lat, selectedSupplier.location.lng)))} minutes
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-4 border-t">
+              <Button onClick={handleCloseSupplyCard} variant="outline" className="flex-1">
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  window.open(
+                    `https://www.google.com/maps/dir/?api=1&destination=${selectedSupplier.location.lat},${selectedSupplier.location.lng}`,
+                    '_blank'
+                  );
+                }}
+                className="flex-1"
+              >
+                <Navigation className="w-4 h-4 mr-2" />
+                Get Directions
+              </Button>
+              <Button
+                onClick={() => {
+                  window.location.href = `tel:${selectedSupplier.phone}`;
+                }}
+                variant="secondary"
+              >
+                <Phone className="w-4 h-4 mr-2" />
+                Call
+              </Button>
+            </div>
+          </div>
+        </PopupCard>
+      )}
     </>
   );
 }
