@@ -11,7 +11,7 @@ import { PopupCard } from './components/ui/popup-card';
 import { Button } from './components/ui/button';
 import { MapPin as MapPinIcon, Phone, Clock, Wrench, Navigation } from 'lucide-react';
 import { Job } from './types';
-import { mockJobs } from './data/mockData';
+import { mockJobs, mockSuppliers } from './data/mockData';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useOffline } from './hooks/useOffline';
 import { Alert, AlertDescription } from './components/ui/alert';
@@ -144,7 +144,7 @@ function App() {
             <div className="absolute inset-0 z-0">
               <InteractiveMap
                 jobs={enhancedMockJobs}
-                suppliers={[]}
+                suppliers={mockSuppliers}
                 onJobSelect={handleJobSelect}
                 onToggleSidebar={toggleSidebar}
                 sidebarOpen={sidebarOpen}
