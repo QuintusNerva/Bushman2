@@ -6,6 +6,7 @@ import { CalendarView } from './components/calendar/CalendarView';
 import { StoreView } from './components/store/StoreView';
 import { MessagesView } from './components/messages/MessagesView';
 import { ContractorDashboard } from './components/profile/ContractorDashboard';
+import { TravelScreen } from './components/travel/TravelScreen';
 import { TodaysSchedule } from './components/dashboard/TodaysSchedule';
 import { PopupCard } from './components/ui/popup-card';
 import { Button } from './components/ui/button';
@@ -22,6 +23,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('jobs');
   const [selectedMapJob, setSelectedMapJob] = useState<Job | null>(null);
   const [selectedMapSupplier, setSelectedMapSupplier] = useState<Supplier | null>(null);
+  const [travelingJob, setTravelingJob] = useState<Job | null>(null);
 
   const { position, error: geoError, getCurrentPosition } = useGeolocation();
   const { isOnline, wasOffline, cacheData, getCachedData } = useOffline();
@@ -58,6 +60,15 @@ function App() {
     console.log('Selected job:', job);
   };
 
+  const handleStartTravel = (job: Job) => {
+    setTravelingJob(job);
+  };
+
+  const handleTravelComplete = () => {
+    setTravelingJob(null);
+    setActiveTab('jobs');
+  };
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -75,7 +86,7 @@ function App() {
   const handleAcceptMapJob = (jobId: string) => {
     const job = enhancedMockJobs.find(j => j.id === jobId);
     if (job) {
-      handleJobSelect(job);
+      handleStartTravel(job);
     }
     setSelectedMapJob(null);
   };
@@ -222,6 +233,16 @@ function App() {
     }
   };
 
+  if (travelingJob) {
+    return (
+      <TravelScreen
+        job={travelingJob}
+        onBack={() => setTravelingJob(null)}
+        onTravelComplete={handleTravelComplete}
+      />
+    );
+  }
+
   return (
     <div className="app-container bg-slate-50 min-h-screen pb-20">
       {!isOnline && (
@@ -353,7 +374,7 @@ function App() {
                 onClick={() => handleAcceptMapJob(selectedMapJob.id)}
                 className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
               >
-                Accept Job
+                Start Travel
               </Button>
             </div>
           </div>
