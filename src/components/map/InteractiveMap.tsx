@@ -6,9 +6,7 @@ import { Job, Supplier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ZoomController } from './ZoomController';
-import { createJobMarker, createSupplierMarker, createContractorMarker, PIN_COLORS } from './MapMarkers';
-import { PopupCard } from '@/components/ui/popup-card';
-import { MapPin, Phone, Clock, Wrench, Navigation } from 'lucide-react';
+import { createJobMarker, createSupplierMarker, createContractorMarker } from './MapMarkers';
 
 
 interface MapControlsProps {
@@ -47,6 +45,10 @@ interface InteractiveMapProps {
   onToggleSidebar: () => void;
   sidebarOpen: boolean;
   className?: string;
+  onJobMarkerClick?: (job: Job) => void;
+  onSupplierMarkerClick?: (supplier: Supplier) => void;
+  selectedJobId?: string | null;
+  selectedSupplierId?: string | null;
 }
 
 export function InteractiveMap({
@@ -55,10 +57,12 @@ export function InteractiveMap({
   onJobSelect,
   onToggleSidebar,
   sidebarOpen,
-  className = 'h-[400px] w-full'
+  className = 'h-[400px] w-full',
+  onJobMarkerClick,
+  onSupplierMarkerClick,
+  selectedJobId,
+  selectedSupplierId
 }: InteractiveMapProps) {
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   
   // Mock contractor location (Orlando)
@@ -78,31 +82,17 @@ export function InteractiveMap({
   };
   
   const handleJobMarkerClick = (job: Job) => {
-    setSelectedJob(job);
-    setSelectedSupplier(null);
+    if (onJobMarkerClick) {
+      onJobMarkerClick(job);
+    }
   };
 
   const handleSupplierMarkerClick = (supplier: Supplier) => {
-    setSelectedSupplier(supplier);
-    setSelectedJob(null);
+    if (onSupplierMarkerClick) {
+      onSupplierMarkerClick(supplier);
+    }
   };
   
-  const handleAcceptJob = (jobId: string) => {
-    console.log(`Job ${jobId} accepted`);
-    const job = jobs.find(j => j.id === jobId);
-    if (job) {
-      onJobSelect(job);
-    }
-    setSelectedJob(null);
-  };
-
-  const handleCloseJobCard = () => {
-    setSelectedJob(null);
-  };
-
-  const handleCloseSupplyCard = () => {
-    setSelectedSupplier(null);
-  };
 
   const calculateDistance = (targetLat: number, targetLng: number) => {
     const R = 3959;
@@ -162,8 +152,7 @@ export function InteractiveMap({
 
 
   return (
-    <>
-      <div className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
         <MapContainer
           center={getMapCenter() as [number, number]}
           zoom={12}
@@ -183,7 +172,7 @@ export function InteractiveMap({
           
           {/* Job markers */}
           {jobs.map((job) => {
-            const isSelected = selectedJob?.id === job.id;
+            const isSelected = selectedJobId === job.id;
             return (
               <Marker
                 key={job.id}
@@ -198,7 +187,7 @@ export function InteractiveMap({
           
           {/* Supplier markers */}
           {suppliers.map((supplier) => {
-            const isSelected = selectedSupplier?.id === supplier.id;
+            const isSelected = selectedSupplierId === supplier.id;
             return (
               <Marker
                 key={supplier.id}
@@ -221,218 +210,5 @@ export function InteractiveMap({
           <MapControls onToggleSidebar={onToggleSidebar} sidebarOpen={sidebarOpen} />
         </MapContainer>
       </div>
-
-      {/* Job Details Modal */}
-      {selectedJob && selectedJob.customer && selectedJob.location && (
-        <PopupCard
-          isOpen={true}
-          onClose={handleCloseJobCard}
-          title={`Job #${selectedJob.id.slice(0, 8).toUpperCase()}`}
-          maxWidth="600px"
-          aria-label={`Job details for ${selectedJob.customer.name}`}
-        >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-slate-900">{selectedJob.customer.name}</h3>
-              <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full border ${getPriorityBadgeClass(selectedJob.priority)}`}>
-                {selectedJob.priority}
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-700">Address</p>
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedJob.location.lat},${selectedJob.location.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 hover:underline"
-                  >
-                    {selectedJob.location.address}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-700">Phone</p>
-                  <a
-                    href={`tel:${selectedJob.customer.phone}`}
-                    className="text-blue-600 hover:text-blue-700 hover:underline"
-                  >
-                    {selectedJob.customer.phone}
-                  </a>
-                </div>
-              </div>
-
-              <div className="border-t pt-3">
-                <div className="flex items-start gap-3 mb-3">
-                  <Wrench className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700">Job Type</p>
-                    <p className="text-slate-900">{formatJobType(selectedJob.type)}</p>
-                  </div>
-                </div>
-
-                {selectedJob.description && (
-                  <p className="text-sm text-slate-600 mb-3">{selectedJob.description}</p>
-                )}
-
-                <div className="flex items-start gap-3 mb-3">
-                  <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700">Scheduled</p>
-                    <p className="text-slate-900">{formatScheduledTime(selectedJob)}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 mb-3">
-                  <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700">Duration</p>
-                    <p className="text-slate-900">{selectedJob.estimatedDuration} {selectedJob.estimatedDuration === 1 ? 'hour' : 'hours'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Navigation className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700">Distance & Drive Time</p>
-                    <p className="text-slate-900">
-                      {calculateDistance(selectedJob.location.lat, selectedJob.location.lng)} miles
-                      <span className="text-slate-600"> • ~{calculateDriveTime(parseFloat(calculateDistance(selectedJob.location.lat, selectedJob.location.lng)))} min drive</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-4 border-t">
-              <Button onClick={handleCloseJobCard} variant="outline" className="flex-1">
-                Close
-              </Button>
-              <Button
-                onClick={() => {
-                  handleAcceptJob(selectedJob.id);
-                }}
-                className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-              >
-                Accept Job
-              </Button>
-            </div>
-          </div>
-        </PopupCard>
-      )}
-
-      {/* Supply House Modal */}
-      {selectedSupplier && (
-        <PopupCard
-          isOpen={true}
-          onClose={handleCloseSupplyCard}
-          title={selectedSupplier.name}
-          maxWidth="600px"
-          aria-label={`Supply house details for ${selectedSupplier.name}`}
-        >
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="text-4xl">🏢</div>
-              <h3 className="text-xl font-bold text-slate-900">{selectedSupplier.name}</h3>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-700">Address</p>
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedSupplier.location.lat},${selectedSupplier.location.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 hover:underline"
-                  >
-                    {selectedSupplier.address}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-700">Phone</p>
-                  <a
-                    href={`tel:${selectedSupplier.phone}`}
-                    className="text-blue-600 hover:text-blue-700 hover:underline"
-                  >
-                    {selectedSupplier.phone}
-                  </a>
-                </div>
-              </div>
-
-              <div className="border-t pt-3">
-                <div className="flex items-start gap-3 mb-3">
-                  <Clock className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700">Hours Today</p>
-                    <p className="text-slate-900">
-                      {selectedSupplier.hours ? `${selectedSupplier.hours.open} - ${selectedSupplier.hours.close}` : 'Hours not available'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 mb-3">
-                  <Navigation className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700">Distance</p>
-                    <p className="text-slate-900">
-                      {calculateDistance(selectedSupplier.location.lat, selectedSupplier.location.lng)} miles
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700">Drive Time</p>
-                    <p className="text-slate-900">
-                      ~{calculateDriveTime(parseFloat(calculateDistance(selectedSupplier.location.lat, selectedSupplier.location.lng)))} minutes
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-4 border-t">
-              <Button onClick={handleCloseSupplyCard} variant="outline" className="flex-1">
-                Close
-              </Button>
-              <Button
-                onClick={() => {
-                  window.open(
-                    `https://www.google.com/maps/dir/?api=1&destination=${selectedSupplier.location.lat},${selectedSupplier.location.lng}`,
-                    '_blank'
-                  );
-                }}
-                className="flex-1"
-              >
-                <Navigation className="w-4 h-4 mr-2" />
-                Get Directions
-              </Button>
-              <Button
-                onClick={() => {
-                  window.location.href = `tel:${selectedSupplier.phone}`;
-                }}
-                variant="secondary"
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                Call
-              </Button>
-            </div>
-          </div>
-        </PopupCard>
-      )}
-    </>
   );
 }

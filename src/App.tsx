@@ -7,6 +7,9 @@ import { StoreView } from './components/store/StoreView';
 import { MessagesView } from './components/messages/MessagesView';
 import { ContractorDashboard } from './components/profile/ContractorDashboard';
 import { TodaysSchedule } from './components/dashboard/TodaysSchedule';
+import { PopupCard } from './components/ui/popup-card';
+import { Button } from './components/ui/button';
+import { MapPin as MapPinIcon, Phone, Clock, Wrench, Navigation } from 'lucide-react';
 import { Job } from './types';
 import { mockJobs } from './data/mockData';
 import { useGeolocation } from './hooks/useGeolocation';
@@ -17,6 +20,7 @@ import { Wifi, WifiOff, MapPin } from 'lucide-react';
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('jobs');
+  const [selectedMapJob, setSelectedMapJob] = useState<Job | null>(null);
 
   const { position, error: geoError, getCurrentPosition } = useGeolocation();
   const { isOnline, wasOffline, cacheData, getCachedData } = useOffline();
@@ -67,6 +71,69 @@ function App() {
     console.log('Navigating to profile');
   };
 
+  const handleAcceptMapJob = (jobId: string) => {
+    const job = enhancedMockJobs.find(j => j.id === jobId);
+    if (job) {
+      handleJobSelect(job);
+    }
+    setSelectedMapJob(null);
+  };
+
+  const formatJobType = (type: string) => {
+    const typeMap: Record<string, string> = {
+      'RO': 'Reverse Osmosis System',
+      'UV': 'UV Light System',
+      'Softener': 'Water Softener',
+      'Whole House': 'Whole House System',
+      'Commercial': 'Commercial System'
+    };
+    return typeMap[type] || type;
+  };
+
+  const formatScheduledTime = (job: Job) => {
+    if (job.status === 'unclaimed') return 'Available Now';
+    if (job.scheduledDate) {
+      const date = new Date(job.scheduledDate);
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+    }
+    return 'TBD';
+  };
+
+  const getPriorityBadgeClass = (priority: string) => {
+    const classes = {
+      low: 'bg-green-50 text-green-700 border-green-200',
+      medium: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+      high: 'bg-red-50 text-red-700 border-red-200',
+      urgent: 'bg-red-600 text-white border-red-700'
+    };
+    return classes[priority as keyof typeof classes] || classes.medium;
+  };
+
+  const calculateDistance = (targetLat: number, targetLng: number) => {
+    const R = 3959;
+    const dLat = (targetLat - contractorLocation.lat) * Math.PI / 180;
+    const dLon = (targetLng - contractorLocation.lng) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(contractorLocation.lat * Math.PI / 180) *
+      Math.cos(targetLat * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return (R * c).toFixed(1);
+  };
+
+  const calculateDriveTime = (distance: number) => {
+    const avgSpeed = 35;
+    const timeInHours = distance / avgSpeed;
+    const minutes = Math.round(timeInHours * 60);
+    return minutes < 1 ? '<1' : minutes.toString();
+  };
+
   // Render the active tab content
   const renderTabContent = () => {
     switch (activeTab) {
@@ -82,6 +149,8 @@ function App() {
                 onToggleSidebar={toggleSidebar}
                 sidebarOpen={sidebarOpen}
                 className="h-full w-full"
+                onJobMarkerClick={setSelectedMapJob}
+                selectedJobId={selectedMapJob?.id || null}
               />
 
               <JobSidebar
@@ -184,6 +253,109 @@ function App() {
       </div>
 
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
+
+      {/* Map Pin Job Details Modal - Rendered at root level for proper z-index */}
+      {selectedMapJob && selectedMapJob.customer && selectedMapJob.location && (
+        <PopupCard
+          isOpen={true}
+          onClose={() => setSelectedMapJob(null)}
+          title={`Job #${selectedMapJob.id.slice(0, 8).toUpperCase()}`}
+          maxWidth="600px"
+          aria-label={`Job details for ${selectedMapJob.customer.name}`}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-slate-900">{selectedMapJob.customer.name}</h3>
+              <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full border ${getPriorityBadgeClass(selectedMapJob.priority)}`}>
+                {selectedMapJob.priority}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <MapPinIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Address</p>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedMapJob.location.lat},${selectedMapJob.location.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    {selectedMapJob.location.address}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Phone className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-700">Phone</p>
+                  <a
+                    href={`tel:${selectedMapJob.customer.phone}`}
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    {selectedMapJob.customer.phone}
+                  </a>
+                </div>
+              </div>
+
+              <div className="border-t pt-3">
+                <div className="flex items-start gap-3 mb-3">
+                  <Wrench className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Job Type</p>
+                    <p className="text-slate-900">{formatJobType(selectedMapJob.type)}</p>
+                  </div>
+                </div>
+
+                {selectedMapJob.description && (
+                  <p className="text-sm text-slate-600 mb-3">{selectedMapJob.description}</p>
+                )}
+
+                <div className="flex items-start gap-3 mb-3">
+                  <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Scheduled</p>
+                    <p className="text-slate-900">{formatScheduledTime(selectedMapJob)}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mb-3">
+                  <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Duration</p>
+                    <p className="text-slate-900">{selectedMapJob.estimatedDuration} {selectedMapJob.estimatedDuration === 1 ? 'hour' : 'hours'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Navigation className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">Distance & Drive Time</p>
+                    <p className="text-slate-900">
+                      {calculateDistance(selectedMapJob.location.lat, selectedMapJob.location.lng)} miles
+                      <span className="text-slate-600"> • ~{calculateDriveTime(parseFloat(calculateDistance(selectedMapJob.location.lat, selectedMapJob.location.lng)))} min drive</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t">
+              <Button onClick={() => setSelectedMapJob(null)} variant="outline" className="flex-1">
+                Close
+              </Button>
+              <Button
+                onClick={() => handleAcceptMapJob(selectedMapJob.id)}
+                className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              >
+                Accept Job
+              </Button>
+            </div>
+          </div>
+        </PopupCard>
+      )}
     </div>
   );
 }
