@@ -25,12 +25,28 @@ interface TravelScreenProps {
 }
 
 export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProps) {
-  const { position } = useGeolocation({ enableWatch: true, enableHighAccuracy: true });
+  const { position, getCurrentPosition } = useGeolocation({ enableWatch: true, enableHighAccuracy: true });
   const [currentSpeed, setCurrentSpeed] = useState(0);
+  const [useFallbackLocation, setUseFallbackLocation] = useState(false);
 
-  const currentLocation = position
+  const fallbackLocation = { lat: 28.5383, lng: -81.3792 };
+
+  const currentLocation = useFallbackLocation
+    ? fallbackLocation
+    : position
     ? { lat: position.lat, lng: position.lng }
     : null;
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!position) {
+        console.log('Location timeout - using fallback location');
+        setUseFallbackLocation(true);
+      }
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [position]);
 
   const destinationLocation = {
     lat: job.location.lat,
@@ -92,14 +108,20 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
     );
   };
 
-  if (!currentLocation && travelState === 'ACCEPTED') {
+  if (!currentLocation && travelState === 'ACCEPTED' && !useFallbackLocation) {
     return (
       <div className="relative h-screen w-full bg-slate-50 flex items-center justify-center">
         <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8 max-w-md mx-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <h3 className="text-lg font-semibold text-slate-900 mb-2">Getting your location...</h3>
-            <p className="text-sm text-slate-600">Please allow location access to start travel</p>
+            <p className="text-sm text-slate-600 mb-4">Please allow location access to start travel</p>
+            <button
+              onClick={() => setUseFallbackLocation(true)}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Use default location instead
+            </button>
           </div>
         </div>
       </div>
