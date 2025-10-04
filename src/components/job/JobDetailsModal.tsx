@@ -148,7 +148,7 @@ export function JobDetailsModal({
   const whenNeeded = getWhenNeeded();
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 99999 }}>
       <div className="max-w-md p-0 overflow-hidden bg-gradient-to-b from-slate-100 to-white border-none rounded-2xl clay-card">
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-700 to-slate-600 p-4 flex items-center rounded-t-2xl">
