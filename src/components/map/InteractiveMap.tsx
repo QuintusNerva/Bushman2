@@ -7,6 +7,7 @@ import { JobQuickView } from './JobQuickView';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { JobDetailsModal } from '@/components/job/JobDetailsModal';
+import { ZoomController } from './ZoomController';
 
 // Fix for default marker icons in Leaflet with Vite
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -43,22 +44,25 @@ interface MapControlsProps {
 
 function MapControls({ onToggleSidebar, sidebarOpen }: MapControlsProps) {
   const map = useMap();
-  
+
   useEffect(() => {
     map.invalidateSize();
   }, [map, sidebarOpen]);
-  
+
   return (
-    <div className="absolute top-3 left-3 z-[1000]">
-      <Button
-        variant="outline"
-        size="icon"
-        className="bg-white shadow-md h-11 w-11 rounded-lg"
-        onClick={onToggleSidebar}
-      >
-        {sidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
-      </Button>
-    </div>
+    <>
+      <div className="absolute top-3 left-3 z-[1000]">
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-white shadow-md h-11 w-11 rounded-lg"
+          onClick={onToggleSidebar}
+        >
+          {sidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+        </Button>
+      </div>
+      <ZoomController />
+    </>
   );
 }
 
@@ -156,6 +160,12 @@ export function InteractiveMap({
         <MapContainer
           center={getMapCenter() as [number, number]}
           zoom={12}
+          minZoom={3}
+          maxZoom={18}
+          scrollWheelZoom={true}
+          doubleClickZoom={true}
+          touchZoom={true}
+          zoomControl={false}
           style={{ height: '100%', width: '100%', borderRadius: '0.75rem' }}
           ref={mapRef as any}
         >
