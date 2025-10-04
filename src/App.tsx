@@ -10,6 +10,7 @@ import { TravelScreen } from './components/travel/TravelScreen';
 import { TodaysSchedule } from './components/dashboard/TodaysSchedule';
 import { PopupCard } from './components/ui/popup-card';
 import { Button } from './components/ui/button';
+import { Toaster } from './components/ui/sonner';
 import { MapPin as MapPinIcon, Phone, Clock, Wrench, Navigation } from 'lucide-react';
 import { Job, Supplier } from './types';
 import { mockJobs, mockSuppliers } from './data/mockData';
@@ -245,6 +246,7 @@ function App() {
 
   return (
     <div className="app-container bg-slate-50 min-h-screen pb-20">
+      <Toaster position="top-center" />
       {!isOnline && (
         <Alert className="fixed top-2 left-2 right-2 z-50 bg-orange-100 border-orange-300">
           <WifiOff className="h-5 w-5 text-orange-600" />

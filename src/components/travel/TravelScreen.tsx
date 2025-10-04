@@ -3,6 +3,7 @@ import { Job } from '@/types';
 import { TravelMap } from './TravelMap';
 import { TravelInfoBar } from './TravelInfoBar';
 import { TravelActionBar } from './TravelActionBar';
+import { BottomNav } from '@/components/layout/BottomNav';
 import { useTravelController } from '@/hooks/useTravelController';
 import { useGeofence } from '@/hooks/useGeofence';
 import { useRoute } from '@/hooks/useRoute';
@@ -28,6 +29,7 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
   const { position, getCurrentPosition } = useGeolocation({ enableWatch: true, enableHighAccuracy: true });
   const [currentSpeed, setCurrentSpeed] = useState(0);
   const [useFallbackLocation, setUseFallbackLocation] = useState(false);
+  const [activeTab, setActiveTab] = useState('jobs');
 
   const fallbackLocation = { lat: 28.5383, lng: -81.3792 };
 
@@ -65,6 +67,7 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
   } = useTravelController({
     jobId: job.id,
     currentLocation,
+    destinationLocation,
     onTravelComplete,
   });
 
@@ -90,6 +93,23 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
 
   const distance = route?.distance || 0;
   const eta = route?.duration ? new Date(Date.now() + route.duration * 1000) : null;
+
+  const calculateDistanceToJob = () => {
+    if (!currentLocation) return 0;
+    const R = 6371000;
+    const dLat = (destinationLocation.lat - currentLocation.lat) * Math.PI / 180;
+    const dLon = (destinationLocation.lng - currentLocation.lng) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(currentLocation.lat * Math.PI / 180) *
+      Math.cos(destinationLocation.lat * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round(R * c);
+  };
+
+  const distanceToJob = calculateDistanceToJob();
+  const isOutsideRadius = distanceToJob > 75;
 
   const handleCallCustomer = () => {
     if (job.customer?.phone) {
@@ -150,17 +170,33 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
       />
 
       <AlertDialog open={showArrivalConfirm} onOpenChange={cancelManualArrival}>
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent className="rounded-2xl bg-white/95 backdrop-blur-xl border-white/20">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Arrival</AlertDialogTitle>
-            <AlertDialogDescription>
-              Have you arrived at the job site? This will mark your travel as complete.
+            <AlertDialogTitle className="text-xl font-bold">Confirm Arrival</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <p className="text-slate-700">
+                You appear to be <span className="font-semibold text-slate-900">~{distanceToJob}m</span> from the job site.
+                Confirm you've arrived on site?
+              </p>
+              {isOutsideRadius && (
+                <p className="text-orange-600 text-sm bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
+                  You're currently outside the typical arrival radius (75m).
+                </p>
+              )}
+              <div className="text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+                <p className="font-medium mb-1">This will:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Stop GPS tracking</li>
+                  <li>Freeze travel timer at {Math.floor(elapsedSeconds / 60)}m {elapsedSeconds % 60}s</li>
+                  <li>Record arrival metrics</li>
+                </ul>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl border-slate-300">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="rounded-xl bg-blue-500 hover:bg-blue-600"
+              className="rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold shadow-lg"
               onClick={confirmManualArrival}
             >
               Confirm Arrival
@@ -176,6 +212,16 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
           </div>
         </div>
       )}
+
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          if (tab !== 'jobs') {
+            onBack();
+          }
+        }}
+      />
     </div>
   );
 }
