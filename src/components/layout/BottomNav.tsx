@@ -15,21 +15,21 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm z-50">
-      <div className="flex justify-around items-center h-16">
+      <div className="flex justify-around items-center h-20 px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
-          
+
           return (
             <button
               key={tab.id}
-              className={`flex flex-col items-center justify-center w-full h-full ${
-                isActive ? 'text-blue-600' : 'text-slate-500'
+              className={`flex flex-col items-center justify-center w-full h-full min-h-[44px] px-2 rounded-lg transition-colors ${
+                isActive ? 'text-blue-600 bg-blue-50' : 'text-slate-500'
               }`}
               onClick={() => onTabChange(tab.id)}
             >
-              <Icon className={`h-5 w-5 ${isActive ? 'text-blue-600' : 'text-slate-500'}`} />
-              <span className={`text-xs mt-1 ${isActive ? 'font-medium' : ''}`}>
+              <Icon className={`h-6 w-6 ${isActive ? 'text-blue-600' : 'text-slate-500'}`} />
+              <span className={`text-xs mt-1.5 ${isActive ? 'font-semibold' : 'font-medium'}`}>
                 {tab.label}
               </span>
             </button>
