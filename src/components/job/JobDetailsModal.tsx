@@ -81,15 +81,15 @@ export function JobDetailsModal({
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
       case 'urgent':
-        return 'bg-red-500 text-white';
+        return 'bg-red-500/20 text-red-400 border border-red-500/30';
       case 'high':
-        return 'bg-orange-500 text-white';
+        return 'bg-orange-500/20 text-orange-400 border border-orange-500/30';
       case 'medium':
-        return 'bg-yellow-500 text-white';
+        return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
       case 'low':
-        return 'bg-green-500 text-white';
+        return 'bg-green-500/20 text-green-400 border border-green-500/30';
       default:
-        return 'bg-slate-500 text-white';
+        return 'bg-slate-500/20 text-slate-400 border border-slate-500/30';
     }
   };
 
@@ -148,46 +148,46 @@ export function JobDetailsModal({
   const whenNeeded = getWhenNeeded();
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 99999 }}>
-      <div className="max-w-md p-0 overflow-hidden bg-gradient-to-b from-slate-100 to-white border-none rounded-2xl clay-card">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4" style={{ zIndex: 99999 }}>
+      <div className="max-w-md p-0 overflow-hidden glass-card-elevated border-none rounded-2xl shadow-2xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-700 to-slate-600 p-4 flex items-center rounded-t-2xl">
-          <Button variant="ghost" size="sm" className="mr-2 text-white hover:bg-slate-600/50 clay-icon-button" onClick={onClose}>
+        <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-4 flex items-center rounded-t-2xl">
+          <Button variant="ghost" size="sm" className="mr-2 text-white hover:bg-white/20" onClick={onClose}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h2 className="text-xl font-semibold text-white flex-1 text-center mr-8">Job Details</h2>
+          <h2 className="text-xl font-bold text-white flex-1 text-center mr-8">Job Details</h2>
         </div>
 
         <div className="p-4 overflow-y-auto max-h-[80vh]">
           {/* Job Header Section */}
-          <div className="clay-card mb-4 p-4">
+          <div className="glass-card mb-4 p-4">
             <div className="flex justify-between items-start mb-1">
-              <h1 className="text-xl font-bold text-slate-800">{job.title}</h1>
-              <Badge className={`${getPriorityColor(job.priority)} px-3 py-1 text-sm font-medium rounded-full`}>
+              <h1 className="text-xl font-bold text-white">{job.title}</h1>
+              <Badge className={`${getPriorityColor(job.priority)} px-3 py-1 text-sm font-bold rounded-full uppercase tracking-wider`}>
                 {job.priority}
               </Badge>
             </div>
-            <p className="text-slate-600">{mockJobDetails.systemModel}</p>
+            <p className="text-slate-300">{mockJobDetails.systemModel}</p>
           </div>
 
           {/* Customer Information Section */}
-          <div className="clay-card mb-4 p-4">
-            <h3 className="text-md font-semibold text-slate-700 mb-3 flex items-center">
-              <User className="h-5 w-5 mr-2 text-indigo-600" />
+          <div className="glass-card mb-4 p-4">
+            <h3 className="text-md font-bold text-white mb-3 flex items-center">
+              <User className="h-5 w-5 mr-2 text-purple-400" />
               Customer Information
             </h3>
             
             <div className="pl-2 mb-3">
               <div className="flex items-center mb-2">
-                <Phone className="h-4 w-4 mr-2 text-pink-500" />
-                <span className="text-slate-800">{job.customer.name} • {job.customer.phone}</span>
+                <Phone className="h-4 w-4 mr-2 text-pink-400" />
+                <span className="text-slate-200">{job.customer.name} • {job.customer.phone}</span>
               </div>
               
               {isScheduled && (
                 <div className="mb-3">
                   <button 
                     onClick={handleContactCustomer}
-                    className="clay-button flex items-center px-3 py-2 text-sm text-blue-600 bg-blue-50 rounded-xl mt-1 w-full"
+                    className="flex items-center px-3 py-2 text-sm text-blue-300 border border-blue-500/30 rounded-xl mt-1 w-full hover:bg-blue-500/10 transition-all"
                   >
                     <PhoneCall className="h-4 w-4 mr-2" />
                     Contact Customer
@@ -196,8 +196,8 @@ export function JobDetailsModal({
               )}
               
               <div className="flex items-start">
-                <MessageSquare className="h-4 w-4 mr-2 text-blue-500 mt-1 flex-shrink-0" />
-                <p className="text-slate-600 text-sm">
+                <MessageSquare className="h-4 w-4 mr-2 text-blue-400 mt-1 flex-shrink-0" />
+                <p className="text-slate-300 text-sm">
                   "{job.description}"
                 </p>
               </div>
@@ -205,23 +205,23 @@ export function JobDetailsModal({
           </div>
 
           {/* Location & Timing Section */}
-          <div className="clay-card mb-4 p-4">
-            <h3 className="text-md font-semibold text-slate-700 mb-3 flex items-center">
-              <MapPin className="h-5 w-5 mr-2 text-red-500" />
+          <div className="glass-card mb-4 p-4">
+            <h3 className="text-md font-bold text-white mb-3 flex items-center">
+              <MapPin className="h-5 w-5 mr-2 text-red-400" />
               Location & Timing
             </h3>
             
             <div className="pl-2">
               <div className="flex items-start mb-2">
                 <MapPin className="h-4 w-4 mr-2 text-red-400 mt-1 flex-shrink-0" />
-                <span className="text-slate-800">{job.location.address}</span>
+                <span className="text-slate-200">{job.location.address}</span>
               </div>
               
               {isScheduled && (
                 <div className="mb-3">
                   <button 
                     onClick={handleGetDirections}
-                    className="clay-button flex items-center px-3 py-2 text-sm text-green-600 bg-green-50 rounded-xl mt-1 w-full"
+                    className="flex items-center px-3 py-2 text-sm text-green-300 border border-green-500/30 rounded-xl mt-1 w-full hover:bg-green-500/10 transition-all"
                   >
                     <Navigation className="h-4 w-4 mr-2" />
                     Get Directions
@@ -230,21 +230,21 @@ export function JobDetailsModal({
               )}
               
               <div className="flex items-center mb-2">
-                <Car className="h-4 w-4 mr-2 text-blue-400" />
-                <span className="text-slate-600 text-sm">{mockJobDetails.parkingInfo}</span>
+                <Car className="h-4 w-4 mr-2 text-cyan-400" />
+                <span className="text-slate-300 text-sm">{mockJobDetails.parkingInfo}</span>
               </div>
               
               <div className="flex items-center mb-3">
                 <Clock className="h-4 w-4 mr-2 text-orange-400" />
-                <span className="text-slate-600 text-sm">{whenNeeded}</span>
+                <span className="text-slate-300 text-sm">{whenNeeded}</span>
               </div>
               
-              <div className="clay-inner p-3 flex justify-between items-center">
+              <div className="glass-card-subtle p-3 flex justify-between items-center">
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 mr-2 text-red-400" />
-                  <span className="text-slate-700">{distance} miles away</span>
+                  <span className="text-slate-200">{distance} miles away</span>
                 </div>
-                <div className="text-blue-500 font-medium">
+                <div className="text-blue-400 font-semibold">
                   Est. {job.estimatedDuration} {job.estimatedDuration === 1 ? 'hour' : 'hours'}
                 </div>
               </div>
@@ -252,37 +252,37 @@ export function JobDetailsModal({
           </div>
 
           {/* Payment & Work Details Section */}
-          <div className="clay-card mb-4 p-4">
-            <h3 className="text-md font-semibold text-slate-700 mb-3 flex items-center">
-              <DollarSign className="h-5 w-5 mr-2 text-green-500" />
+          <div className="glass-card mb-4 p-4">
+            <h3 className="text-md font-bold text-white mb-3 flex items-center">
+              <DollarSign className="h-5 w-5 mr-2 text-green-400" />
               Payment & Work Details
             </h3>
             
             <div className="pl-2">
               <div className="flex items-center mb-3">
                 <DollarSign className="h-4 w-4 mr-2 text-green-400" />
-                <div className="bg-green-500 text-white px-3 py-1 rounded-full font-semibold">
+                <div className="bg-gradient-to-r from-green-500 to-green-400 text-white px-4 py-1.5 rounded-full font-bold">
                   ${mockJobDetails.paymentAmount}
                 </div>
-                <span className="text-slate-600 text-sm ml-2">paid immediately</span>
+                <span className="text-slate-300 text-sm ml-2">paid immediately</span>
               </div>
               
               <div className="flex items-start mb-2">
                 <FileText className="h-4 w-4 mr-2 text-slate-400 mt-1 flex-shrink-0" />
-                <p className="text-slate-700 text-sm">{job.description}</p>
+                <p className="text-slate-200 text-sm">{job.description}</p>
               </div>
               
               <div className="flex items-center">
                 <Key className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-slate-600 text-sm">{mockJobDetails.accessDetails}</span>
+                <span className="text-slate-300 text-sm">{mockJobDetails.accessDetails}</span>
               </div>
             </div>
           </div>
 
           {/* Parts & Requirements Section */}
-          <div className="clay-card mb-4 p-4">
-            <h3 className="text-md font-semibold text-slate-700 mb-3 flex items-center">
-              <Package className="h-5 w-5 mr-2 text-slate-500" />
+          <div className="glass-card mb-4 p-4">
+            <h3 className="text-md font-bold text-white mb-3 flex items-center">
+              <Package className="h-5 w-5 mr-2 text-amber-400" />
               Parts & Requirements
             </h3>
             
@@ -290,12 +290,12 @@ export function JobDetailsModal({
               {mockJobDetails.requiredParts.map((part, index) => (
                 <div key={index} className="flex items-center mb-2">
                   <Package className="h-4 w-4 mr-2 text-purple-300" />
-                  <span className="text-slate-700 text-sm">{part}</span>
+                  <span className="text-slate-200 text-sm">{part}</span>
                 </div>
               ))}
             </div>
             
-            <Button className="w-full clay-button bg-blue-500 hover:bg-blue-600 text-white">
+            <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white transition-all">
               <ShoppingBag className="h-4 w-4 mr-2" />
               Parts needed for this job
             </Button>
@@ -305,14 +305,14 @@ export function JobDetailsModal({
           {isScheduled ? (
             <div className="flex gap-3 mt-5 mb-2">
               <button 
-                className="flex-1 clay-button bg-slate-200 hover:bg-slate-300 text-slate-700 py-3 rounded-xl flex items-center justify-center"
+                className="flex-1 text-white py-3 rounded-xl flex items-center justify-center border border-white/30 transition-all hover:bg-white/10"
                 onClick={handleReschedule}
               >
                 <Calendar className="h-4 w-4 mr-2" />
                 Reschedule
               </button>
               <button 
-                className="flex-1 clay-button bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl flex items-center justify-center"
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-3 rounded-xl flex items-center justify-center transition-all"
                 onClick={handleStartJob}
               >
                 <Play className="h-4 w-4 mr-2" />
@@ -322,13 +322,13 @@ export function JobDetailsModal({
           ) : (
             <div className="flex gap-3 mt-5 mb-2">
               <Button 
-                className="flex-1 clay-button bg-slate-200 hover:bg-slate-300 text-slate-700"
+                className="flex-1 text-white border border-white/30 hover:bg-white/10"
                 onClick={() => onReject(job.id)}
               >
                 Reject Job
               </Button>
               <Button 
-                className="flex-1 clay-button bg-green-500 hover:bg-green-600 text-white"
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white transition-all"
                 onClick={() => onAccept(job.id)}
               >
                 Accept Job

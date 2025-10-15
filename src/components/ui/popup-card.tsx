@@ -134,14 +134,14 @@ export function PopupCard({
       aria-describedby={ariaDescribedBy}
     >
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
         aria-hidden="true"
       />
 
       <div
         ref={cardRef}
         className={cn(
-          'relative bg-white rounded-2xl shadow-2xl transform transition-all duration-300',
+          'relative glass-card-elevated rounded-2xl shadow-2xl transform transition-all duration-300',
           'flex flex-col overflow-hidden',
           isAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0',
           className
@@ -153,9 +153,9 @@ export function PopupCard({
         }}
       >
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 flex-shrink-0">
             {title && (
-              <h2 className="text-xl font-bold text-slate-900 pr-8">
+              <h2 className="text-xl font-bold text-white pr-8">
                 {title}
               </h2>
             )}
@@ -166,10 +166,10 @@ export function PopupCard({
                 className={cn(
                   'flex items-center justify-center',
                   'w-10 h-10 rounded-full',
-                  'bg-slate-100 hover:bg-slate-200',
-                  'text-slate-600 hover:text-slate-900',
+                  'bg-white/10 hover:bg-white/20',
+                  'text-slate-300 hover:text-white',
                   'transition-all duration-200',
-                  'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+                  'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#2a2f38]',
                   title ? 'ml-auto' : 'ml-auto'
                 )}
                 aria-label="Close dialog"
@@ -192,19 +192,19 @@ export function PopupCard({
             width: 8px;
           }
           .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 4px;
           }
           .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 4px;
           }
           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: rgba(255, 255, 255, 0.3);
           }
           .custom-scrollbar {
             scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 #f1f5f9;
+            scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
           }
         `
       }} />

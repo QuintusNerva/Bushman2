@@ -46,34 +46,34 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
   const getJobTypeAccentColor = (type: string) => {
     switch (type) {
       case 'UV':
-        return 'border-l-amber-500';
+        return 'border-l-amber-400';
       case 'RO':
-        return 'border-l-orange-500';
+        return 'border-l-orange-400';
       case 'Softener':
-        return 'border-l-blue-500';
+        return 'border-l-blue-400';
       case 'Whole House':
-        return 'border-l-green-500';
+        return 'border-l-green-400';
       case 'Commercial':
-        return 'border-l-red-500';
+        return 'border-l-red-400';
       default:
-        return 'border-l-slate-500';
+        return 'border-l-slate-400';
     }
   };
 
   const getJobTypeTextColor = (type: string) => {
     switch (type) {
       case 'UV':
-        return 'text-amber-600';
+        return 'text-amber-400';
       case 'RO':
-        return 'text-orange-600';
+        return 'text-orange-400';
       case 'Softener':
-        return 'text-blue-600';
+        return 'text-blue-400';
       case 'Whole House':
-        return 'text-green-600';
+        return 'text-green-400';
       case 'Commercial':
-        return 'text-red-600';
+        return 'text-red-400';
       default:
-        return 'text-slate-600';
+        return 'text-slate-400';
     }
   };
 
@@ -126,7 +126,7 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
           todaysJobs.map((job) => (
             <div
               key={job.id}
-              className={`flex-shrink-0 w-[220px] bg-white/98 backdrop-blur-xl rounded-[14px] shadow-lg cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden border-l-[4px] snap-start ${getJobTypeAccentColor(job.type)}`}
+              className={`flex-shrink-0 w-[220px] glass-card-elevated backdrop-blur-xl rounded-[14px] shadow-lg cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden border-l-[4px] snap-start ${getJobTypeAccentColor(job.type)}`}
               onClick={() => handleJobClick(job)}
             >
               <div className="p-3">
@@ -136,10 +136,10 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
                   </p>
                 </div>
 
-                <h3 className="font-bold text-slate-900 text-sm mb-1.5 leading-tight">
+                <h3 className="font-bold text-white text-sm mb-1.5 leading-tight">
                   {job.customer.name}
                 </h3>
-                <p className="text-xs text-slate-500 mb-2 line-clamp-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mb-2 line-clamp-1 leading-relaxed">
                   {job.location.address}
                 </p>
                 <p className={`text-[10px] font-bold uppercase tracking-wider ${getJobTypeTextColor(job.type)}`}>
@@ -149,7 +149,7 @@ export function TodaysSchedule({ jobs, contractorLocation }: TodaysScheduleProps
             </div>
           ))
         ) : (
-          <div className="flex-shrink-0 w-[220px] bg-white/90 backdrop-blur-xl rounded-[14px] border-2 border-dashed border-white/70 p-4 flex items-center justify-center shadow-lg snap-start">
+          <div className="flex-shrink-0 w-[220px] glass-card-elevated backdrop-blur-xl rounded-[14px] border-2 border-dashed border-white/30 p-4 flex items-center justify-center shadow-lg snap-start">
             <p className="text-white text-sm font-semibold drop-shadow-lg">No jobs scheduled</p>
           </div>
         )}

@@ -13,17 +13,22 @@ interface TravelMapProps {
 const createCurrentLocationMarker = () => {
   return L.divIcon({
     html: `
-      <div style="
-        width: 24px;
-        height: 24px;
-        background: #3b82f6;
-        border: 4px solid white;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      "></div>
+      <style>
+        .marker-dot-current {
+          width: 20px;
+          height: 20px;
+          background-color: #5b9bd5;
+          border-radius: 50%;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+      </style>
+      <div class="marker-dot-current"></div>
     `,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
     className: 'current-location-marker',
   });
 };
@@ -31,23 +36,22 @@ const createCurrentLocationMarker = () => {
 const createDestinationMarker = () => {
   return L.divIcon({
     html: `
-      <div style="
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-        border: 4px solid white;
-        border-radius: 50%;
-        box-shadow: 0 4px 12px rgba(139,92,246,0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-      ">
-        📍
-      </div>
+      <style>
+        .marker-dot-destination {
+          width: 24px;
+          height: 24px;
+          background-color: #a78bfa;
+          border-radius: 50%;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+      </style>
+      <div class="marker-dot-destination"></div>
     `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
     className: 'destination-marker',
   });
 };
@@ -94,16 +98,32 @@ export function TravelMap({
         scrollWheelZoom={true}
         className="h-full w-full rounded-2xl"
         ref={mapRef}
+        zoomControl={false}
       >
+        {/* Light, clean tile layer - same as main map */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
 
         <MapBounds
           currentLocation={currentLocation}
           destinationLocation={destinationLocation}
         />
+
+        {/* Route polyline */}
+        {routePolyline && routePolyline.length > 0 && (
+          <Polyline
+            positions={routePolyline.map((p) => [p.lat, p.lng])}
+            pathOptions={{
+              color: '#5b9bd5',
+              weight: 5,
+              opacity: 0.8,
+              lineCap: 'round',
+              lineJoin: 'round'
+            }}
+          />
+        )}
 
         {currentLocation && (
           <Marker
@@ -116,16 +136,6 @@ export function TravelMap({
           position={[destinationLocation.lat, destinationLocation.lng]}
           icon={createDestinationMarker()}
         />
-
-        {routePolyline && routePolyline.length > 0 && (
-          <Polyline
-            positions={routePolyline.map((p) => [p.lat, p.lng])}
-            color="#3b82f6"
-            weight={4}
-            opacity={0.7}
-            dashArray="10, 10"
-          />
-        )}
       </MapContainer>
     </div>
   );

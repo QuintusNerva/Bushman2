@@ -47,7 +47,7 @@ export const mockJobs: Job[] = [
     title: 'UV Light Replacement',
     description: 'Annual UV light bulb replacement and system maintenance. Scheduled maintenance for residential customer.',
     type: 'UV',
-    status: 'claimed',
+    status: 'scheduled',
     location: {
       lat: 28.4813,
       lng: -81.4481,
@@ -62,6 +62,11 @@ export const mockJobs: Job[] = [
     estimatedDuration: 1,
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
     claimedBy: 'contractor-1',
+    scheduledDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Tomorrow
+    payment: {
+      hourlyRate: 95,
+      total: 95,
+    },
   },
   {
     id: '4',
@@ -103,13 +108,17 @@ export const mockJobs: Job[] = [
     estimatedDuration: 4,
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
     scheduledDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+    payment: {
+      hourlyRate: 95,
+      total: 380,
+    },
   },
   {
     id: '6',
     title: 'Softener System Repair',
     description: 'Water softener not regenerating properly. Customer reports hard water returning after recent installation.',
     type: 'Softener',
-    status: 'unclaimed',
+    status: 'scheduled',
     location: {
       lat: 28.5644,
       lng: -81.3378,
@@ -123,6 +132,11 @@ export const mockJobs: Job[] = [
     priority: 'high',
     estimatedDuration: 2,
     createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+    scheduledDate: new Date(Date.now()), // Today
+    payment: {
+      hourlyRate: 125,
+      total: 250,
+    },
   },
   {
     id: '7',
@@ -169,7 +183,7 @@ export const mockJobs: Job[] = [
     title: 'UV System Installation',
     description: 'Install new UV sterilization system for well water treatment. Customer concerned about bacteria in private well.',
     type: 'UV',
-    status: 'claimed',
+    status: 'scheduled',
     location: {
       lat: 28.4389,
       lng: -81.4092,
@@ -184,6 +198,11 @@ export const mockJobs: Job[] = [
     estimatedDuration: 3,
     createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
     claimedBy: 'contractor-2',
+    scheduledDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+    payment: {
+      hourlyRate: 125,
+      total: 375,
+    },
   },
   {
     id: '10',

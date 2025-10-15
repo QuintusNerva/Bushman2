@@ -96,43 +96,43 @@ export function ZoomController() {
       <Button
         variant="outline"
         size="icon"
-        className={`bg-white shadow-md h-11 w-11 rounded-lg transition-all ${
-          isAtMaxZoom ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'
-        } ${isZooming ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}`}
+        className={`bg-white/95 backdrop-blur-sm shadow-lg hover:shadow-xl h-11 w-11 rounded-xl border-gray-200 hover:bg-white transition-all ${
+          isAtMaxZoom ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
         onClick={handleZoomIn}
         disabled={isAtMaxZoom}
         title="Zoom In"
       >
-        <Plus className="h-5 w-5" />
+        <Plus className="h-5 w-5 text-gray-700" />
       </Button>
 
       <Button
         variant="outline"
         size="icon"
-        className={`bg-white shadow-md h-11 w-11 rounded-lg transition-all ${
-          isAtMinZoom ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'
-        } ${isZooming ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}`}
+        className={`bg-white/95 backdrop-blur-sm shadow-lg hover:shadow-xl h-11 w-11 rounded-xl border-gray-200 hover:bg-white transition-all ${
+          isAtMinZoom ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
         onClick={handleZoomOut}
         disabled={isAtMinZoom}
         title="Zoom Out"
       >
-        <Minus className="h-5 w-5" />
+        <Minus className="h-5 w-5 text-gray-700" />
       </Button>
 
-      <div className="h-px bg-slate-200 my-1"></div>
+      <div className="h-px bg-gray-200 my-1"></div>
 
       <Button
         variant="outline"
         size="icon"
-        className="bg-white shadow-md h-11 w-11 rounded-lg hover:bg-blue-50 transition-all"
+        className="bg-white/95 backdrop-blur-sm shadow-lg hover:shadow-xl h-11 w-11 rounded-xl border-gray-200 hover:bg-white transition-all"
         onClick={handleResetView}
         title="Reset View"
       >
-        <Maximize2 className="h-5 w-5" />
+        <Maximize2 className="h-5 w-5 text-gray-700" />
       </Button>
 
-      <div className="bg-white shadow-md rounded-lg px-2 py-1 text-center mt-1">
-        <span className="text-xs font-medium text-slate-600">
+      <div className="bg-white/95 backdrop-blur-sm shadow-lg rounded-xl px-3 py-1.5 text-center mt-1 border border-gray-200">
+        <span className="text-xs font-semibold text-gray-700">
           {currentZoom.toFixed(1)}x
         </span>
       </div>

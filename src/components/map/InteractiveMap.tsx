@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Job, Supplier } from '@/types';
@@ -27,10 +27,10 @@ function MapControls({ onToggleSidebar, sidebarOpen }: MapControlsProps) {
         <Button
           variant="outline"
           size="icon"
-          className="bg-white shadow-md h-11 w-11 rounded-lg"
+          className="bg-white/95 backdrop-blur-sm shadow-lg hover:shadow-xl h-11 w-11 rounded-xl border-gray-200 hover:bg-white transition-all"
           onClick={onToggleSidebar}
         >
-          {sidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+          {sidebarOpen ? <ChevronLeft className="h-5 w-5 text-gray-700" /> : <ChevronRight className="h-5 w-5 text-gray-700" />}
         </Button>
       </div>
       <ZoomController />
@@ -151,6 +151,29 @@ export function InteractiveMap({
   };
 
 
+  // Create gradient polyline from contractor to first job (if jobs exist)
+  const getRoutePolylines = () => {
+    if (jobs.length === 0) return [];
+    
+    // Sort jobs by priority to create a route
+    const sortedJobs = [...jobs].sort((a, b) => {
+      const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+      return priorityOrder[a.priority as keyof typeof priorityOrder] - priorityOrder[b.priority as keyof typeof priorityOrder];
+    });
+
+    const firstJob = sortedJobs[0];
+    
+    return [
+      {
+        positions: [
+          [contractorLocation.lat, contractorLocation.lng],
+          [firstJob.location.lat, firstJob.location.lng]
+        ] as [number, number][],
+        color: '#5b9bd5', // Blue to pink gradient effect
+      }
+    ];
+  };
+
   return (
     <div className={`relative ${className}`}>
         <MapContainer
@@ -165,10 +188,26 @@ export function InteractiveMap({
           style={{ height: '100%', width: '100%', borderRadius: '0.75rem' }}
           ref={mapRef as any}
         >
+          {/* Light, clean tile layer */}
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
+          
+          {/* Route polylines with gradient effect */}
+          {getRoutePolylines().map((route, idx) => (
+            <Polyline
+              key={idx}
+              positions={route.positions}
+              pathOptions={{
+                color: route.color,
+                weight: 5,
+                opacity: 0.8,
+                lineCap: 'round',
+                lineJoin: 'round'
+              }}
+            />
+          ))}
           
           {/* Job markers */}
           {jobs.map((job) => {

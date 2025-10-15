@@ -23,15 +23,15 @@ export function JobSidebar({ jobs, onJobSelect, open, onOpenChange }: JobSidebar
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return 'text-red-600 bg-red-50 border-red-200';
+        return 'text-red-400 bg-red-500/20 border-red-500/30';
       case 'high':
-        return 'text-orange-600 bg-orange-50 border-orange-200';
+        return 'text-orange-400 bg-orange-500/20 border-orange-500/30';
       case 'medium':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+        return 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30';
       case 'low':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-green-400 bg-green-500/20 border-green-500/30';
       default:
-        return 'text-slate-600 bg-slate-50 border-slate-200';
+        return 'text-slate-400 bg-slate-500/20 border-slate-500/30';
     }
   };
 
@@ -42,44 +42,44 @@ export function JobSidebar({ jobs, onJobSelect, open, onOpenChange }: JobSidebar
           <SheetTitle>Available Jobs</SheetTitle>
         </SheetHeader>
         
-        <div className="job-list divide-y">
+        <div className="job-list divide-y divide-white/10">
           {jobs.map((job) => (
             <div 
               key={job.id}
               className={`p-4 cursor-pointer transition-colors ${
                 selectedJob?.id === job.id 
-                  ? 'bg-blue-50' 
-                  : 'hover:bg-slate-50'
+                  ? 'bg-blue-500/20' 
+                  : 'hover:bg-white/5'
               }`}
               onClick={() => handleJobClick(job)}
             >
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-medium">{job.title}</h3>
+                <h3 className="font-semibold text-white">{job.title}</h3>
                 <Badge className={`capitalize ${getPriorityColor(job.priority)}`}>
                   {job.priority}
                 </Badge>
               </div>
               
-              <p className="text-sm text-slate-600 mb-3">{job.description}</p>
+              <p className="text-sm text-slate-300 mb-3">{job.description}</p>
               
               <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <MapPin className="h-4 w-4" />
+                <div className="flex items-center gap-2 text-slate-400">
+                  <MapPin className="h-4 w-4 text-blue-400" />
                   <span>{job.location.address}</span>
                 </div>
                 
-                <div className="flex items-center gap-2 text-slate-500">
-                  <Clock className="h-4 w-4" />
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Clock className="h-4 w-4 text-blue-400" />
                   <span>Est. {job.estimatedDuration} {job.estimatedDuration === 1 ? 'hour' : 'hours'}</span>
                 </div>
                 
-                <div className="flex items-center gap-2 text-slate-500">
-                  <Phone className="h-4 w-4" />
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Phone className="h-4 w-4 text-blue-400" />
                   <span>{job.customer.phone}</span>
                 </div>
                 
-                <div className="flex items-center gap-2 text-slate-500">
-                  <Mail className="h-4 w-4" />
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Mail className="h-4 w-4 text-blue-400" />
                   <span>{job.customer.email}</span>
                 </div>
               </div>
@@ -93,9 +93,9 @@ export function JobSidebar({ jobs, onJobSelect, open, onOpenChange }: JobSidebar
           
           {jobs.length === 0 && (
             <div className="p-8 text-center">
-              <AlertTriangle className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="font-medium mb-1">No jobs available</h3>
-              <p className="text-sm text-slate-500">There are no jobs available in your area at the moment.</p>
+              <AlertTriangle className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+              <h3 className="font-semibold text-white mb-1">No jobs available</h3>
+              <p className="text-sm text-slate-400">There are no jobs available in your area at the moment.</p>
             </div>
           )}
         </div>

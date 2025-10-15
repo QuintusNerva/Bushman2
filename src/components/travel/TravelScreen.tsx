@@ -8,6 +8,8 @@ import { useTravelController } from '@/hooks/useTravelController';
 import { useGeofence } from '@/hooks/useGeofence';
 import { useRoute } from '@/hooks/useRoute';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -156,6 +158,19 @@ export function TravelScreen({ job, onBack, onTravelComplete }: TravelScreenProp
         routePolyline={route?.polyline}
         className="absolute inset-0"
       />
+
+      {/* Cancel/Back Button */}
+      <div className="absolute top-4 left-4 z-[1001]">
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-white/98 backdrop-blur-sm shadow-lg hover:shadow-xl h-11 w-11 rounded-xl border-gray-200 hover:bg-white transition-all"
+          onClick={onBack}
+          title="Cancel Navigation"
+        >
+          <ArrowLeft className="h-5 w-5 text-gray-700" />
+        </Button>
+      </div>
 
       <TravelInfoBar distance={distance} eta={eta} elapsedSeconds={elapsedSeconds} />
 
